@@ -1,0 +1,6 @@
+Flask
+gunicorn
+psycopg2-binary
+Flask-Bcrypt
+Flask-Login
+python-dotenv
