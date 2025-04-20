@@ -1,6 +1,26 @@
-Flask
-gunicorn
-psycopg2-binary
-Flask-Bcrypt
-Flask-Login
-python-dotenv
+# Core Flask
+Flask>=2.0
+
+# Database ORM & Migrations
+Flask-SQLAlchemy>=2.5
+Flask-Migrate>=3.0
+psycopg2-binary # Or psycopg2 if you prefer/need to build from source
+
+# Authentication & Security
+Flask-Login>=0.5
+Flask-Bcrypt>=0.7
+
+# Environment & Configuration
+python-dotenv>=0.19
+
+# WSGI Server (for production)
+gunicorn>=20.0
+
+# Optional: For API Validation/Serialization
+# marshmallow>=3.0
+# Flask-Marshmallow>=0.14
+# pydantic>=1.8 # If using Pydantic instead of Marshmallow
+
+# Optional: Testing
+pytest>=6.0
+pytest-flask>=1.2

@@ -1,121 +1,162 @@
--- Clear existing data (Optional - use if you only want this exact data)
--- DELETE FROM balance_adjustments;
--- DELETE FROM notifications;
--- DELETE FROM did_requests;
--- DELETE FROM rule_targets;
--- DELETE FROM rule_campaigns;
--- DELETE FROM forwarding_rules;
--- DELETE FROM campaign_dids;
--- DELETE FROM dids;
--- DELETE FROM targets;
--- DELETE FROM campaigns;
--- DELETE FROM users WHERE role != 'admin'; -- Keep admin if exists
--- DELETE FROM users WHERE role = 'admin' AND username != 'admin_user'; -- Keep specific admin
-
--- Reset sequences (Optional - if you want IDs to start from 1)
--- SELECT setval(pg_get_serial_sequence('users', 'id'), coalesce(max(id), 0)+1 , false) FROM users;
--- SELECT setval(pg_get_serial_sequence('dids', 'id'), coalesce(max(id), 0)+1 , false) FROM dids;
--- SELECT setval(pg_get_serial_sequence('campaigns', 'id'), coalesce(max(id), 0)+1 , false) FROM campaigns;
--- SELECT setval(pg_get_serial_sequence('targets', 'id'), coalesce(max(id), 0)+1 , false) FROM targets;
--- SELECT setval(pg_get_serial_sequence('forwarding_rules', 'id'), coalesce(max(id), 0)+1 , false) FROM forwarding_rules;
--- SELECT setval(pg_get_serial_sequence('balance_adjustments', 'id'), coalesce(max(id), 0)+1 , false) FROM balance_adjustments;
--- SELECT setval(pg_get_serial_sequence('notifications', 'id'), coalesce(max(id), 0)+1 , false) FROM notifications;
--- SELECT setval(pg_get_serial_sequence('did_requests', 'id'), coalesce(max(id), 0)+1 , false) FROM did_requests;
--- SELECT setval(pg_get_serial_sequence('call_detail_records', 'id'), coalesce(max(id), 0)+1 , false) FROM call_detail_records;
-
+-- CapConduit Redesigned Sample Data (v3.0 - ARA Focused) - CORRECTED v3
+-- For database: call_platform_db
+-- Assumes schema v3.0 is already applied.
 
 BEGIN; -- Start Transaction
 
 -- === Users ===
--- Ensure passwords below are hashed using your app's Bcrypt logic if running directly
--- For this SQL script, we'll insert placeholder hashes. Replace if needed.
--- Hash for "Password123!" (Example - generate this with bcrypt in Python)
--- python -c "import bcrypt; print(bcrypt.hashpw(b'Password123!', bcrypt.gensalt()).decode('utf-8'))"
--- Example hash: $2b$12$EXAMPLEHASHFORADMINUSERXXXXXXXXXXXXXXXXXXXXXX.
--- Example hash: $2b$12$EXAMPLEHASHFORUSERALICEXXXXXXXXXXXXXXXXXXXXX.
--- Example hash: $2b$12$EXAMPLEHASHFORUSERBOBXXXXXXXXXXXXXXXXXXXXXX.
+-- Passwords below are example bcrypt hashes for "Password123!"
+-- Generate real hashes using your application's bcrypt library.
+INSERT INTO users (username, email, password_hash, role, status, full_name, company_name) VALUES
+('platform_admin', 'admin@capconduit.local', '$2a$12$yP4MEm9XPNvdDUR0bWUXrOKfm/RXWCVDmNH6Piol9VqI1RdG3sJJG', 'admin', 'active', 'Admin User', 'CapConduit HQ'),
+('ops_staff', 'staff@capconduit.local', '$2a$12$yP4MEm9XPNvdDUR0bWUXrOKfm/RXWCVDmNH6Piol9VqI1RdG3sJJG', 'staff', 'active', 'Operations Staff', 'CapConduit HQ'),
+('seller_alice', 'alice@seller.xyz', '$2a$12$yP4MEm9XPNvdDUR0bWUXrOKfm/RXWCVDmNH6Piol9VqI1RdG3sJJG', 'user', 'active', 'Alice Wonderland', 'Alice Leads Ltd.'),
+('seller_bob', 'bob@broker.xyz', '$2a$12$yP4MEm9XPNvdDUR0bWUXrOKfm/RXWCVDmNH6Piol9VqI1RdG3sJJG', 'user', 'active', 'Bob The Broker', 'Bob Call Services')
+ON CONFLICT (username) DO NOTHING;
 
-INSERT INTO users (username, email, password_hash, role, balance, status, contact_name, company_name) VALUES
-('admin_user', 'admin@capconduit.test', '$2b$12$EXAMPLEHASHFORADMINUSERXXXXXXXXXXXXXXXXXXXXXX.', 'admin', 0.0000, 'active', 'Platform Admin', 'CapConduit HQ'),
-('alice_seller', 'alice@seller.test', '$2b$12$EXAMPLEHASHFORUSERALICEXXXXXXXXXXXXXXXXXXXXX.', 'user', 100.0000, 'active', 'Alice Smith', 'Alice Leads Co'),
-('bob_broker', 'bob@broker.test', '$2b$12$EXAMPLEHASHFORUSERBOBXXXXXXXXXXXXXXXXXXXXXX.', 'user', 75.5000, 'active', 'Bob Jones', 'Bob Call Brokerage')
-ON CONFLICT (username) DO NOTHING; -- Avoid errors if admin_user already exists
+-- === Clients (Call Centers) ===
+-- The `client_identifier` is crucial as it will likely be the PJSIP endpoint ID.
+INSERT INTO clients (client_identifier, name, department, status, notes, created_by) VALUES
+('client_alpha_sales', 'Alpha Corp', 'Sales Department', 'active', 'Primary client for tech leads.', (SELECT id FROM users WHERE username = 'platform_admin')),
+('client_beta_support', 'Beta Industries', 'Customer Support', 'active', 'Handles overflow support calls.', (SELECT id FROM users WHERE username = 'platform_admin')),
+('client_gamma_intake', 'Gamma Services', 'New Client Intake', 'active', 'Requires authentication. High volume.', (SELECT id FROM users WHERE username = 'ops_staff')),
+('client_delta_partners', 'Delta Partners Inc', 'Partner Relations', 'inactive', 'Currently inactive campaign.', (SELECT id FROM users WHERE username = 'ops_staff'))
+ON CONFLICT (client_identifier) DO NOTHING;
 
-
--- === DIDs ===
--- Get User IDs (adjust if IDs are different after inserts/resets)
-DO $$ DECLARE admin_id INT; alice_id INT; bob_id INT;
+-- Start PL/pgSQL block to handle variable assignment
+DO $$
+DECLARE
+    admin_user_id INT;
+    staff_user_id INT;
+    alice_user_id INT;
+    bob_user_id INT;
+    client_alpha_id INT;
+    client_beta_id INT;
+    client_gamma_id INT;
+    client_delta_id INT;
+    did_alice_1_id INT;
+    did_alice_2_id INT;
+    did_bob_1_id INT;
+    did_alice_uk_id INT;
+    campaign_alice_prio_id INT;
+    campaign_alice_rr_id INT;
+    campaign_bob_prio_id INT;
+    ccs_alice_prio_alpha_id INT;
+    ccs_alice_prio_beta_id INT;
+    ccs_alice_rr_beta_id INT;
+    ccs_alice_rr_gamma_id INT;
+    ccs_bob_prio_gamma_id INT;
+    ccs_bob_prio_alpha_id INT;
+    ccs_bob_prio_delta_id INT;
 BEGIN
-   SELECT id INTO admin_id FROM users WHERE username = 'admin_user';
-   SELECT id INTO alice_id FROM users WHERE username = 'alice_seller';
-   SELECT id INTO bob_id FROM users WHERE username = 'bob_broker';
+    -- Get User IDs
+    SELECT id INTO admin_user_id FROM users WHERE username = 'platform_admin';
+    SELECT id INTO staff_user_id FROM users WHERE username = 'ops_staff';
+    SELECT id INTO alice_user_id FROM users WHERE username = 'seller_alice';
+    SELECT id INTO bob_user_id FROM users WHERE username = 'seller_bob';
 
-   INSERT INTO dids (number, country_code, number_type, assignment_status, assigned_user_id, provider_source, monthly_cost) VALUES
-   ('+18005551001', 'US', 'TFN', 'assigned', alice_id, 'Twilio', 2.00),        -- Alice's TFN
-   ('+12125551002', 'US', 'Local', 'assigned', alice_id, 'Bandwidth', 1.00),   -- Alice's NY Local
-   ('+13105551003', 'US', 'Local', 'assigned', bob_id, 'Twilio', 1.00),        -- Bob's CA Local
-   ('+442075551004', 'GB', 'Local', 'unassigned', NULL, 'Test Provider', 1.20), -- Unassigned UK
-   ('+18885551005', 'US', 'TFN', 'unassigned', NULL, 'Bandwidth', 2.00);       -- Unassigned TFN
+    -- Get Client IDs
+    SELECT id INTO client_alpha_id FROM clients WHERE client_identifier = 'client_alpha_sales';
+    SELECT id INTO client_beta_id FROM clients WHERE client_identifier = 'client_beta_support';
+    SELECT id INTO client_gamma_id FROM clients WHERE client_identifier = 'client_gamma_intake';
+    SELECT id INTO client_delta_id FROM clients WHERE client_identifier = 'client_delta_partners';
 
--- === Campaigns ===
-   INSERT INTO campaigns (user_id, name, description, status, cap_daily, cap_hourly) VALUES
-   (alice_id, 'Alice Google Ads Leads', 'Insurance leads from Google', 'active', 200, 25),
-   (alice_id, 'Alice Facebook Leads', 'Home service leads from FB', 'active', 100, NULL),
-   (bob_id, 'Bob SEO Calls', 'Organic SEO traffic calls', 'active', 50, 10),
-   (bob_id, 'Bob Partner Calls', 'Calls from partner network', 'inactive', NULL, NULL); -- Inactive campaign
+    -- === PJSIP Configuration (Matching Clients) ===
 
--- === Link DIDs to Campaigns ===
-   -- Link +18005551001 to Alice Google Ads Leads (assuming DID ID 1, Campaign ID 1)
-   INSERT INTO campaign_dids (campaign_id, did_id) VALUES
-   ((SELECT id FROM campaigns WHERE user_id = alice_id AND name = 'Alice Google Ads Leads'), (SELECT id FROM dids WHERE number = '+18005551001')),
-   ((SELECT id FROM campaigns WHERE user_id = alice_id AND name = 'Alice Facebook Leads'), (SELECT id FROM dids WHERE number = '+12125551002'));
-   -- Link +13105551003 to Bob SEO Calls (assuming DID ID 3, Campaign ID 3)
-   INSERT INTO campaign_dids (campaign_id, did_id) VALUES
-   ((SELECT id FROM campaigns WHERE user_id = bob_id AND name = 'Bob SEO Calls'), (SELECT id FROM dids WHERE number = '+13105551003'));
+    -- PJSIP Endpoints (id must match client_identifier)
+    INSERT INTO pjsip_endpoints (id, client_id, transport, aors, context, allow, outbound_auth, callerid, from_user, from_domain) VALUES
+    ('client_alpha_sales', client_alpha_id, 'transport-udp', 'client_alpha_sales', 'from-capconduit', 'ulaw,alaw', NULL, 'Alice Leads <+18005551111>', 'alice_out', 'capconduit.local'),
+    ('client_beta_support', client_beta_id, 'transport-udp', 'client_beta_support', 'from-capconduit', 'ulaw,alaw,gsm', NULL, 'CapConduit <+18885552222>', NULL, NULL),
+    ('client_gamma_intake', client_gamma_id, 'transport-udp', 'client_gamma_intake', 'from-capconduit', 'ulaw', 'auth_to_gamma', 'Bob Broker <+19005553333>', 'bob_calls', 'capconduit.local'),
+    ('client_delta_partners', client_delta_id, 'transport-udp', 'client_delta_partners', 'from-capconduit', 'ulaw', NULL, 'System <+17775554444>', NULL, NULL)
+    ON CONFLICT (id) DO NOTHING; -- Added semicolon
 
--- === Targets ===
-   INSERT INTO targets (user_id, name, client_name, destination_type, destination_uri, concurrency_limit, total_calls_allowed, status) VALUES
-   (alice_id, 'Alice Client X', 'Client X Insurance', 'SIP', 'sip:sales@clientx.com:5060', 10, 5000, 'active'),
-   (alice_id, 'Alice Client Y', 'Client Y Home Svcs', 'SIP', 'sip:intake@clienty.org:5066', 5, NULL, 'active'),
-   (bob_id, 'Bob Client Z', 'Client Z Corp', 'SIP', 'sip:1001@bob-client-z.pbx.local', 20, 10000, 'active'),
-   (bob_id, 'Bob Client W (Overflow)', 'Client W Backup', 'IAX2', 'iax2:guest@clientw.com/iax-context', 2, NULL, 'active');
+    -- PJSIP AORs (Address of Record - Where to send calls)
+    INSERT INTO pjsip_aors (id, client_id, contact, max_contacts, qualify_frequency) VALUES
+    ('client_alpha_sales', client_alpha_id, 'sip:10.10.10.1:5060', 1, 60),
+    ('client_beta_support', client_beta_id, 'sip:sip.betasupport.com;transport=udp', 1, 60),
+    ('client_gamma_intake', client_gamma_id, 'sip:intake@gamma.internal:5064', 1, 30),
+    ('client_delta_partners', client_delta_id, 'sip:192.168.50.100', 1, 0)
+    ON CONFLICT (id) DO NOTHING; -- Added semicolon
 
--- === Forwarding Rules ===
-   INSERT INTO forwarding_rules (user_id, name, routing_strategy, min_billable_duration, status) VALUES
-   (alice_id, 'Alice Google Ads to Client X', 'Primary', 30, 'active'),
-   (alice_id, 'Alice FB to Client Y', 'Primary', 60, 'active'),
-   (bob_id, 'Bob SEO to Client Z (Primary)', 'Priority', 15, 'active');
+    -- PJSIP Auths (Only needed if WE need to authenticate TO the client)
+    INSERT INTO pjsip_auths (id, client_id, auth_type, username, password, realm) VALUES
+    ('auth_to_gamma', client_gamma_id, 'userpass', 'capconduit_user', 'GammaSecretPassw0rd', 'gamma.internal')
+    ON CONFLICT (id) DO NOTHING; -- Added semicolon
 
--- === Link Rules to Campaigns ===
-   INSERT INTO rule_campaigns (rule_id, campaign_id) VALUES
-   ((SELECT id FROM forwarding_rules WHERE user_id = alice_id AND name = 'Alice Google Ads to Client X'), (SELECT id FROM campaigns WHERE user_id = alice_id AND name = 'Alice Google Ads Leads')),
-   ((SELECT id FROM forwarding_rules WHERE user_id = alice_id AND name = 'Alice FB to Client Y'), (SELECT id FROM campaigns WHERE user_id = alice_id AND name = 'Alice Facebook Leads')),
-   ((SELECT id FROM forwarding_rules WHERE user_id = bob_id AND name = 'Bob SEO to Client Z (Primary)'), (SELECT id FROM campaigns WHERE user_id = bob_id AND name = 'Bob SEO Calls'));
 
--- === Link Rules to Targets ===
-   INSERT INTO rule_targets (rule_id, target_id, priority, weight) VALUES
-   -- Alice Google Ads -> Client X
-   ((SELECT id FROM forwarding_rules WHERE user_id = alice_id AND name = 'Alice Google Ads to Client X'), (SELECT id FROM targets WHERE user_id = alice_id AND name = 'Alice Client X'), 0, 100),
-   -- Alice FB -> Client Y
-   ((SELECT id FROM forwarding_rules WHERE user_id = alice_id AND name = 'Alice FB to Client Y'), (SELECT id FROM targets WHERE user_id = alice_id AND name = 'Alice Client Y'), 0, 100),
-   -- Bob SEO -> Client Z (Priority 0), Client W (Priority 1)
-   ((SELECT id FROM forwarding_rules WHERE user_id = bob_id AND name = 'Bob SEO to Client Z (Primary)'), (SELECT id FROM targets WHERE user_id = bob_id AND name = 'Bob Client Z'), 0, 100),
-   ((SELECT id FROM forwarding_rules WHERE user_id = bob_id AND name = 'Bob SEO to Client Z (Primary)'), (SELECT id FROM targets WHERE user_id = bob_id AND name = 'Bob Client W (Overflow)'), 1, 100);
+    -- === DIDs ===
+    INSERT INTO dids (number, user_id, status, description) VALUES
+    ('+18005550101', alice_user_id, 'active', 'Alice Campaign A TFN'),
+    ('+12125550102', alice_user_id, 'active', 'Alice Campaign B Local NY'),
+    ('+13105550103', bob_user_id, 'active', 'Bob Campaign C Local CA'),
+    ('+442075550104', alice_user_id, 'inactive', 'Alice UK Number (Inactive)'); -- Added semicolon (end of statement)
+
+    -- Select IDs reliably after the insert
+    SELECT id INTO did_alice_1_id FROM dids WHERE number = '+18005550101';
+    SELECT id INTO did_alice_2_id FROM dids WHERE number = '+12125550102';
+    SELECT id INTO did_bob_1_id FROM dids WHERE number = '+13105550103';
+    SELECT id INTO did_alice_uk_id FROM dids WHERE number = '+442075550104';
+
+    -- === Campaigns ===
+    INSERT INTO campaigns (user_id, name, status, routing_strategy, dial_timeout_seconds, description) VALUES
+    (alice_user_id, 'Alice Priority Tech Leads', 'active', 'priority', 25, 'Sends tech support leads, Client Alpha first.'),
+    (alice_user_id, 'Alice RoundRobin Support', 'active', 'round_robin', 35, 'Distributes support calls between Beta and Gamma.'),
+    (bob_user_id, 'Bob Weighted Sales Calls', 'active', 'weighted', 20, 'Sends sales calls mainly to Gamma, fallback Alpha.'); -- Added semicolon (end of statement)
+
+    -- Select IDs reliably after the insert
+    SELECT id INTO campaign_alice_prio_id FROM campaigns WHERE user_id = alice_user_id AND name = 'Alice Priority Tech Leads';
+    SELECT id INTO campaign_alice_rr_id FROM campaigns WHERE user_id = alice_user_id AND name = 'Alice RoundRobin Support';
+    SELECT id INTO campaign_bob_prio_id FROM campaigns WHERE user_id = bob_user_id AND name = 'Bob Weighted Sales Calls';
+
+
+    -- === Campaign DIDs (Link DIDs to Campaigns) ===
+    INSERT INTO campaign_dids (campaign_id, did_id) VALUES
+    (campaign_alice_prio_id, did_alice_1_id),
+    (campaign_alice_rr_id, did_alice_2_id),
+    (campaign_bob_prio_id, did_bob_1_id); -- Added semicolon (end of statement)
+
+
+    -- === Campaign Client Settings (The Core Logic) ===
+    INSERT INTO campaign_client_settings (campaign_id, client_id, status, max_concurrency, total_calls_allowed, current_total_calls, forwarding_priority, weight) VALUES
+    (campaign_alice_prio_id, client_alpha_id, 'active', 10, 5000, 0, 0, 100),
+    (campaign_alice_prio_id, client_beta_id, 'active', 5, NULL, 0, 1, 100),
+    (campaign_alice_rr_id, client_beta_id, 'active', 8, 1000, 0, 0, 100),
+    (campaign_alice_rr_id, client_gamma_id, 'active', 15, 2000, 0, 1, 100),
+    (campaign_bob_prio_id, client_gamma_id, 'active', 20, 10000, 0, 0, 70),
+    (campaign_bob_prio_id, client_alpha_id, 'active', 5, 2000, 0, 1, 30),
+    (campaign_bob_prio_id, client_delta_id, 'inactive', 2, 100, 0, 2, 100);
+
+    -- Select IDs reliably after the insert
+    SELECT id INTO ccs_alice_prio_alpha_id FROM campaign_client_settings WHERE campaign_id = campaign_alice_prio_id AND client_id = client_alpha_id;
+    SELECT id INTO ccs_alice_prio_beta_id FROM campaign_client_settings WHERE campaign_id = campaign_alice_prio_id AND client_id = client_beta_id;
+    SELECT id INTO ccs_alice_rr_beta_id FROM campaign_client_settings WHERE campaign_id = campaign_alice_rr_id AND client_id = client_beta_id;
+    SELECT id INTO ccs_alice_rr_gamma_id FROM campaign_client_settings WHERE campaign_id = campaign_alice_rr_id AND client_id = client_gamma_id;
+    SELECT id INTO ccs_bob_prio_gamma_id FROM campaign_client_settings WHERE campaign_id = campaign_bob_prio_id AND client_id = client_gamma_id;
+    SELECT id INTO ccs_bob_prio_alpha_id FROM campaign_client_settings WHERE campaign_id = campaign_bob_prio_id AND client_id = client_alpha_id;
+    SELECT id INTO ccs_bob_prio_delta_id FROM campaign_client_settings WHERE campaign_id = campaign_bob_prio_id AND client_id = client_delta_id;
+
+    -- === Call Logs (Example Scenarios) ===
+    INSERT INTO call_logs (user_id, campaign_id, did_id, client_id, campaign_client_setting_id, incoming_did_number, caller_id_num, timestamp_start, timestamp_answered, timestamp_end, duration_seconds, billsec_seconds, call_status, hangup_cause_code, hangup_cause_text, asterisk_uniqueid, asterisk_linkedid) VALUES
+    (alice_user_id, campaign_alice_prio_id, did_alice_1_id, client_alpha_id, ccs_alice_prio_alpha_id, '+18005550101', '+15551234567', NOW() - INTERVAL '2 hour', NOW() - INTERVAL '1 hour 59 minutes 50 seconds', NOW() - INTERVAL '1 hour 58 minutes', 110, 100, 'ANSWERED', 16, 'Normal Clearing', 'uniqueid-call-001', 'linkedid-call-001'),
+    (alice_user_id, campaign_alice_prio_id, did_alice_1_id, client_beta_id, ccs_alice_prio_beta_id, '+18005550101', '+15557654321', NOW() - INTERVAL '1 hour', NOW() - INTERVAL '59 minutes 45 seconds', NOW() - INTERVAL '59 minutes', 45, 30, 'ANSWERED', 16, 'Normal Clearing', 'uniqueid-call-002', 'linkedid-call-002'),
+    (alice_user_id, campaign_alice_rr_id, did_alice_2_id, client_beta_id, ccs_alice_rr_beta_id, '+12125550102', '+15551112222', NOW() - INTERVAL '30 minutes', NOW() - INTERVAL '29 minutes 55 seconds', NOW() - INTERVAL '28 minutes', 115, 110, 'ANSWERED', 16, 'Normal Clearing', 'uniqueid-call-003', 'linkedid-call-003'),
+    (alice_user_id, campaign_alice_rr_id, did_alice_2_id, client_gamma_id, ccs_alice_rr_gamma_id, '+12125550102', '+15553334444', NOW() - INTERVAL '20 minutes', NULL, NOW() - INTERVAL '19 minutes', 60, 0, 'NOANSWER', 19, 'No Answer from user', 'uniqueid-call-004', 'linkedid-call-004'),
+    (bob_user_id, campaign_bob_prio_id, did_bob_1_id, client_gamma_id, ccs_bob_prio_gamma_id, '+13105550103', '+15559998888', NOW() - INTERVAL '10 minutes', NOW() - INTERVAL '9 minutes 50 seconds', NOW() - INTERVAL '8 minutes', 110, 100, 'ANSWERED', 16, 'Normal Clearing', 'uniqueid-call-005', 'linkedid-call-005'),
+    (bob_user_id, campaign_bob_prio_id, did_bob_1_id, NULL, NULL, '+13105550103', '+15557776666', NOW() - INTERVAL '5 minutes', NULL, NOW() - INTERVAL '5 minutes', 0, 0, 'REJECTED_TOTAL', 0, 'Rejected - Total Calls Cap', 'uniqueid-call-006', 'linkedid-call-006'); -- Added semicolon (end of statement)
+
+    -- Update counters based on sample calls (Manual simulation for sample data)
+    UPDATE campaign_client_settings SET current_total_calls = current_total_calls + 1 WHERE id = ccs_alice_prio_alpha_id;
+    UPDATE campaign_client_settings SET current_total_calls = current_total_calls + 1 WHERE id = ccs_alice_prio_beta_id;
+    UPDATE campaign_client_settings SET current_total_calls = current_total_calls + 1 WHERE id = ccs_alice_rr_beta_id;
+    UPDATE campaign_client_settings SET current_total_calls = current_total_calls + 1 WHERE id = ccs_bob_prio_gamma_id;
+    UPDATE campaign_client_settings SET current_total_calls = total_calls_allowed WHERE id = ccs_bob_prio_gamma_id AND total_calls_allowed IS NOT NULL;
 
 END $$; -- End DO block
-
--- === System Settings ===
--- Ensure billing rate exists (will update if already present)
-INSERT INTO system_settings (setting_key, setting_value, description)
-VALUES ('billing_rate_per_minute', '0.0600', 'Global cost per minute charged to user balance (USD)')
-ON CONFLICT (setting_key) DO UPDATE SET
-    setting_value = EXCLUDED.setting_value,
-    description = EXCLUDED.description,
-    updated_at = CURRENT_TIMESTAMP;
 
 
 COMMIT; -- Commit Transaction
 
 VACUUM ANALYZE; -- Update statistics for the query planner
 
-SELECT 'Sample data loaded successfully!' AS status;
+SELECT 'CapConduit Sample Data v3.0 (ARA Focused) loaded successfully!' AS status;
