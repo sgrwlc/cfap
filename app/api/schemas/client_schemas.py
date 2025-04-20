@@ -75,7 +75,8 @@ class CreateClientSchema(Schema):
 
     # PJSIP fields nested under 'pjsip' key
     pjsip = fields.Nested(
-        lambda: PjsipWrapperSchema(context={'client_identifier_field': 'clientIdentifier'}), # Pass context
+        # lambda: PjsipWrapperSchema(context={'client_identifier_field': 'clientIdentifier'}), # REMOVE CONTEXT
+        lambda: PjsipWrapperSchema(), # Use this simpler lambda
         required=True
     )
 
@@ -102,23 +103,23 @@ class UpdateClientSchema(Schema):
     notes = fields.Str(allow_none=True)
 
     # PJSIP fields nested under 'pjsip' key
-    # All parts are optional during update
+    # All parts are optional during update, and allow partial data within them
     pjsip = fields.Nested(
-        lambda: UpdatePjsipWrapperSchema(),
+        lambda: UpdatePjsipWrapperSchema(), # No need for partial here, UpdatePjsipWrapperSchema handles it
         required=False
     )
 
 # Helper schema for updating PJSIP data (all nested parts are optional)
 class UpdatePjsipWrapperSchema(Schema):
-     endpoint = fields.Nested(PjsipEndpointSchema, required=False)
-     aor = fields.Nested(PjsipAorSchema, required=False)
-     auth = fields.Nested(PjsipAuthSchema, required=False, allow_none=True) # allow_none=True allows sending 'null' to delete auth
-
+    # Allow partial updates for nested schemas
+    endpoint = fields.Nested(lambda: PjsipEndpointSchema(partial=True), required=False) # ADD partial=True
+    aor = fields.Nested(lambda: PjsipAorSchema(partial=True), required=False)         # ADD partial=True
+    auth = fields.Nested(lambda: PjsipAuthSchema(partial=True), required=False, allow_none=True) # ADD partial=True
 
 # Schema for client list pagination response
 class ClientListSchema(Schema):
     items = fields.List(fields.Nested(ClientSchema()), required=True)
     page = fields.Int(required=True)
-    per_page = fields.Int(required=True, data_key="perPage")
+    perPage = fields.Int(required=True, attribute="per_page")
     total = fields.Int(required=True)
     pages = fields.Int(required=True)

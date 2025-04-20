@@ -66,12 +66,12 @@ def admin_get_users():
         paginated_users = UserService.get_all_users(page=page, per_page=per_page)
         # Serialize response using pagination schema
         result = user_list_schema.dump({
-            'items': paginated_users.items,
-            'page': paginated_users.page,
-            'perPage': paginated_users.per_page,
-            'total': paginated_users.total,
-            'pages': paginated_users.pages
-        })
+        'items': paginated_users.items,
+        'page': paginated_users.page,
+        'per_page': paginated_users.per_page, # Still pass the attribute name
+        'total': paginated_users.total,
+        'pages': paginated_users.pages
+    })
         return jsonify(result), 200
     except Exception as e:
         current_app.logger.exception(f"Unexpected error fetching users: {e}")

@@ -1,0 +1,1237 @@
+2025-04-20 18:18:28,098 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 18:22:12,555 WARNING: Failed login attempt for username: 'alice_seller'. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:61]
+2025-04-20 18:22:23,550 WARNING: Failed login attempt for username: 'admin_user'. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:61]
+2025-04-20 18:22:54,025 INFO: User 'platform_admin' logged in successfully. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:45]
+2025-04-20 18:23:24,271 WARNING: Forbidden access attempt to seller_get_dids: User 'platform_admin' (Role: admin) does not have required role(s): ['user'] [in /Users/sudhanshu/projects/cfap/app/utils/decorators.py:27]
+2025-04-20 18:23:44,271 INFO: User 'platform_admin' (ID: 1) logged out. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:71]
+2025-04-20 18:24:03,795 INFO: User 'seller_alice' logged in successfully. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:45]
+2025-04-20 18:39:50,290 INFO: User 'seller_alice' (ID: 3) logged out. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:71]
+2025-04-20 18:39:56,920 WARNING: Failed login attempt for username: 'platform_admin'. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:61]
+2025-04-20 18:40:13,205 WARNING: Failed login attempt for username: 'nosuchuser'. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:61]
+2025-04-20 18:40:23,416 WARNING: Failed login attempt for username: 'nosuchuser'. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:61]
+2025-04-20 18:40:49,973 INFO: User 'platform_admin' logged in successfully. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:45]
+2025-04-20 18:41:08,757 INFO: User 'platform_admin' logged in successfully. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:45]
+2025-04-20 18:41:44,584 INFO: User 'platform_admin' (ID: 1) logged out. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:71]
+2025-04-20 18:42:19,706 INFO: User 'seller_alice' logged in successfully. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:45]
+2025-04-20 18:42:48,277 INFO: User 'seller_alice' (ID: 3) logged out. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:71]
+2025-04-20 18:43:23,798 WARNING: Unauthorized access attempt to admin_get_users: User not authenticated. [in /Users/sudhanshu/projects/cfap/app/utils/decorators.py:21]
+2025-04-20 18:43:47,583 INFO: User 'platform_admin' logged in successfully. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:45]
+2025-04-20 18:45:39,470 ERROR: Admin create user error: Username 'new_test_seller' already exists. [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_users.py:49]
+2025-04-20 18:45:59,187 ERROR: Admin create user error: Email 'test@seller.co' already exists. [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_users.py:49]
+2025-04-20 18:46:19,022 WARNING: Admin create user validation error: {'role': ['Must be one of: admin, staff, user.']} [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_users.py:40]
+2025-04-20 18:46:32,563 WARNING: Admin create user validation error: {'password': ['Shorter than minimum length 8.']} [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_users.py:40]
+2025-04-20 18:48:51,224 ERROR: Admin update user error for ID 5: Email 'alice@seller.xyz' is already in use. [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_users.py:118]
+2025-04-20 18:49:46,564 WARNING: Admin change password validation error for ID 5: {'password': ['Shorter than minimum length 8.']} [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_users.py:137]
+2025-04-20 18:51:04,812 ERROR: Admin delete user error for ID 100: User with ID 100 not found. [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_users.py:171]
+2025-04-20 18:51:21,782 INFO: User 'platform_admin' (ID: 1) logged out. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:71]
+2025-04-20 18:51:46,653 INFO: User 'seller_alice' logged in successfully. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:45]
+2025-04-20 18:51:59,158 WARNING: Forbidden access attempt to admin_get_users: User 'seller_alice' (Role: user) does not have required role(s): ['admin'] [in /Users/sudhanshu/projects/cfap/app/utils/decorators.py:27]
+2025-04-20 19:01:00,240 INFO: User 'platform_admin' logged in successfully. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:45]
+2025-04-20 19:01:29,364 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 19:04:49,698 ERROR: Exception on /api/admin/clients [POST] [in /Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/utils/decorators.py", line 38, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py", line 37, in admin_create_client
+    data = create_client_schema.load(json_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 730, in load
+    return self._do_load(
+           ^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 887, in _do_load
+    result = self._deserialize(
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 676, in _deserialize
+    value = self._call_and_store(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 517, in _call_and_store
+    value = getter_func(data)
+            ^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 669, in getter
+    return field_obj.deserialize(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 374, in deserialize
+    output = self._deserialize(value, attr, data, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 620, in _deserialize
+    self._test_collection(value)
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 589, in _test_collection
+    many = self.schema.many or self.many
+           ^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 529, in schema
+    nested = self.nested()
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/api/schemas/client_schemas.py", line 78, in <lambda>
+    lambda: PjsipWrapperSchema(context={'client_identifier_field': 'clientIdentifier'}), # Pass context
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Schema.__init__() got an unexpected keyword argument 'context'
+2025-04-20 19:04:49,703 ERROR: Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 19:05:06,823 ERROR: Exception on /api/admin/clients [POST] [in /Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/utils/decorators.py", line 38, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py", line 37, in admin_create_client
+    data = create_client_schema.load(json_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 730, in load
+    return self._do_load(
+           ^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 887, in _do_load
+    result = self._deserialize(
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 676, in _deserialize
+    value = self._call_and_store(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 517, in _call_and_store
+    value = getter_func(data)
+            ^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 669, in getter
+    return field_obj.deserialize(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 374, in deserialize
+    output = self._deserialize(value, attr, data, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 620, in _deserialize
+    self._test_collection(value)
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 589, in _test_collection
+    many = self.schema.many or self.many
+           ^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 529, in schema
+    nested = self.nested()
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/api/schemas/client_schemas.py", line 78, in <lambda>
+    lambda: PjsipWrapperSchema(context={'client_identifier_field': 'clientIdentifier'}), # Pass context
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Schema.__init__() got an unexpected keyword argument 'context'
+2025-04-20 19:05:06,824 ERROR: Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 19:06:08,725 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 19:06:12,634 ERROR: Exception on /api/admin/clients [POST] [in /Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/utils/decorators.py", line 38, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py", line 37, in admin_create_client
+    data = create_client_schema.load(json_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 730, in load
+    return self._do_load(
+           ^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 887, in _do_load
+    result = self._deserialize(
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 676, in _deserialize
+    value = self._call_and_store(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 517, in _call_and_store
+    value = getter_func(data)
+            ^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 669, in getter
+    return field_obj.deserialize(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 374, in deserialize
+    output = self._deserialize(value, attr, data, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 620, in _deserialize
+    self._test_collection(value)
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 589, in _test_collection
+    many = self.schema.many or self.many
+           ^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 529, in schema
+    nested = self.nested()
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/api/schemas/client_schemas.py", line 78, in <lambda>
+    lambda: PjsipWrapperSchema(context={'client_identifier_field': 'clientIdentifier'}), # Pass context
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Schema.__init__() got an unexpected keyword argument 'context'
+2025-04-20 19:06:12,636 ERROR: Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 19:07:07,605 ERROR: Exception on /api/admin/clients [POST] [in /Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py:875]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/utils/decorators.py", line 38, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py", line 37, in admin_create_client
+    data = create_client_schema.load(json_data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 730, in load
+    return self._do_load(
+           ^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 887, in _do_load
+    result = self._deserialize(
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 676, in _deserialize
+    value = self._call_and_store(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 517, in _call_and_store
+    value = getter_func(data)
+            ^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/schema.py", line 669, in getter
+    return field_obj.deserialize(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 374, in deserialize
+    output = self._deserialize(value, attr, data, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 620, in _deserialize
+    self._test_collection(value)
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 589, in _test_collection
+    many = self.schema.many or self.many
+           ^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/marshmallow/fields.py", line 529, in schema
+    nested = self.nested()
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/api/schemas/client_schemas.py", line 78, in <lambda>
+    lambda: PjsipWrapperSchema(context={'client_identifier_field': 'clientIdentifier'}), # Pass context
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Schema.__init__() got an unexpected keyword argument 'context'
+2025-04-20 19:07:07,607 ERROR: Internal Server Error: The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 19:11:49,517 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 19:15:31,157 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 19:22:25,572 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 19:23:05,139 ERROR: Admin create client error: Client identifier 'client_epsilon_hr' already exists. [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:74]
+2025-04-20 19:23:19,344 WARNING: Admin create client validation error: {'pjsip': {'endpoint': ['Missing data for required field.'], 'aor': ['Missing data for required field.']}} [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:39]
+2025-04-20 19:24:48,455 WARNING: Admin update client validation error for ID 5: {'pjsip': {'aor': {'id': ['Missing data for required field.']}}} [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:131]
+2025-04-20 19:25:10,655 WARNING: Admin update client validation error for ID 5: {'pjsip': {'aor': {'id': ['Missing data for required field.']}}} [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:131]
+2025-04-20 19:26:51,236 WARNING: Admin update client validation error for ID 5: {'pjsip': {'endpoint': {'id': ['Missing data for required field.'], 'context': ['Missing data for required field.']}}} [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:131]
+2025-04-20 19:27:16,417 WARNING: Admin update client validation error for ID 5: {'pjsip': {'aor': {'id': ['Missing data for required field.']}}} [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:131]
+2025-04-20 19:27:36,224 WARNING: Admin update client validation error for ID 5: {'pjsip': {'endpoint': {'id': ['Missing data for required field.'], 'context': ['Missing data for required field.']}}} [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:131]
+2025-04-20 19:27:50,355 WARNING: Admin update client validation error for ID 5: {'pjsip': {'endpoint': {'id': ['Missing data for required field.'], 'context': ['Missing data for required field.']}}} [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:131]
+2025-04-20 19:28:44,262 ERROR: Admin delete client error for ID 1: Cannot delete client 1 because it is linked to active campaigns. Deactivate links first. [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:169]
+2025-04-20 19:29:09,218 ERROR: Admin delete client error for ID 83: Client with ID 83 not found. [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:169]
+2025-04-20 19:38:25,459 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 19:39:34,591 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 19:39:43,116 ERROR: Admin delete client error for ID 83: Client with ID 83 not found. [in /Users/sudhanshu/projects/cfap/app/api/routes/admin_clients.py:169]
+2025-04-20 19:41:03,317 INFO: User 'platform_admin' (ID: 1) logged out. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:71]
+2025-04-20 19:41:37,698 INFO: User 'seller_alice' logged in successfully. [in /Users/sudhanshu/projects/cfap/app/api/routes/auth.py:45]
+2025-04-20 19:41:45,002 WARNING: Forbidden access attempt to admin_get_clients: User 'seller_alice' (Role: user) does not have required role(s): ['admin'] [in /Users/sudhanshu/projects/cfap/app/utils/decorators.py:27]
+2025-04-20 20:02:52,925 ERROR: Seller add DID error for user 3: DID number '+19995550105' already exists in the system. [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:46]
+2025-04-20 20:05:31,474 ERROR: Seller update DID error for ID 3, user 3: User is not authorized to update this DID. [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:118]
+2025-04-20 20:05:49,513 ERROR: Seller delete DID error for ID 3, user 3: User is not authorized to delete this DID. [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:137]
+2025-04-20 20:07:58,939 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 20:11:15,638 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 20:13:41,661 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 20:29:48,580 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 20:29:53,271 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:72]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 60, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:29:53,277 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:29:55,894 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:72]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 60, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:29:55,896 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:30:00,987 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:72]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 60, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:30:00,990 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:30:01,864 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:72]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 60, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:30:01,867 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:30:02,609 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:72]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 60, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:30:02,613 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:30:13,099 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:72]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 60, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:30:13,102 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:30:13,966 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:72]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 60, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:30:13,969 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:31:02,094 INFO: CapConduit CFAP startup in production mode [in /Users/sudhanshu/projects/cfap/app/config.py:70]
+2025-04-20 20:31:06,446 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:76]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 64, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:31:06,450 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:31:28,793 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:76]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 64, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:31:28,796 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:31:30,195 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:76]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 64, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:31:30,198 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:31:30,618 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:76]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 64, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:31:30,621 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:31:31,352 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:76]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 64, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:31:31,354 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]
+2025-04-20 20:31:31,819 ERROR: Unexpected error fetching DIDs for user 3: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405) [in /Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py:76]
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'ellipsis'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/sudhanshu/projects/cfap/app/api/routes/seller_dids.py", line 64, in seller_get_dids
+    paginated_dids = DidService.get_dids_for_user(...)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/app/services/did_service.py", line 119, in get_dids_for_user
+    dids = query.paginate(page=page, per_page=per_page, error_out=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/query.py", line 98, in paginate
+    return QueryPagination(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 72, in __init__
+    items = self._query_items()
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/flask_sqlalchemy/pagination.py", line 358, in _query_items
+    out = query.limit(self.per_page).offset(self._query_offset).all()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2858, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 523, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1638, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1843, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1983, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2352, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1964, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Users/sudhanshu/projects/cfap/venv/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 945, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.ProgrammingError: (psycopg2.ProgrammingError) can't adapt type 'ellipsis'
+[SQL: SELECT dids.id AS dids_id, dids.number AS dids_number, dids.user_id AS dids_user_id, dids.status AS dids_status, dids.description AS dids_description, dids.created_at AS dids_created_at, dids.updated_at AS dids_updated_at 
+FROM dids 
+WHERE dids.user_id = %(user_id_1)s ORDER BY dids.number 
+ LIMIT %(param_1)s OFFSET %(param_2)s]
+[parameters: {'user_id_1': Ellipsis, 'param_1': 20, 'param_2': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-04-20 20:31:31,821 ERROR: Internal Server Error: Could not fetch DIDs. [in /Users/sudhanshu/projects/cfap/app/__init__.py:105]

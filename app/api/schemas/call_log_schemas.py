@@ -93,6 +93,7 @@ class CallLogSchema(Schema):
 class CallLogListSchema(Schema):
     items = fields.List(fields.Nested(CallLogSchema()), required=True)
     page = fields.Int(required=True)
-    per_page = fields.Int(required=True, data_key="perPage")
+    # Rename field, map attribute
+    perPage = fields.Int(required=True, attribute="per_page") # <-- APPLY FIX HERE
     total = fields.Int(required=True)
     pages = fields.Int(required=True)

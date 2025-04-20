@@ -46,6 +46,10 @@ class ChangePasswordSchema(Schema):
 class UserListSchema(Schema):
     items = fields.List(fields.Nested(UserSchema()), required=True)
     page = fields.Int(required=True)
-    per_page = fields.Int(required=True, data_key="perPage")
+    # Rename field to match data_key, remove data_key if needed
+    # Option A: Rename field, keep data_key (should also work)
+    # perPage = fields.Int(required=True, attribute="per_page", data_key="perPage")
+    # Option B: Rename field, remove data_key (cleaner if output key matches field name)
+    perPage = fields.Int(required=True, attribute="per_page") # Map field 'perPage' to object attribute 'per_page'
     total = fields.Int(required=True)
     pages = fields.Int(required=True)

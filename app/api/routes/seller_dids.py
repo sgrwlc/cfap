@@ -2,6 +2,7 @@
 """
 Seller API Routes for DID Management.
 """
+import logging
 from flask import Blueprint, request, jsonify, current_app, abort
 from flask_login import current_user
 from marshmallow import ValidationError
@@ -54,10 +55,9 @@ def seller_add_did():
 @seller_dids_bp.route('', methods=['GET'])
 @seller_required
 def seller_get_dids():
-    """Seller: Get list of own DIDs (paginated)."""
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
-    status = request.args.get('status', None, type=str) # Filter by 'active' or 'inactive'
+    status = request.args.get('status', None, type=str)
 
     try:
         paginated_dids = DidService.get_dids_for_user(
@@ -66,18 +66,19 @@ def seller_get_dids():
             per_page=per_page,
             status=status
         )
+        # Error most likely happens during dump() if pagination worked
         result = did_list_schema.dump({
             'items': paginated_dids.items,
             'page': paginated_dids.page,
-            'perPage': paginated_dids.per_page,
+            'per_page': paginated_dids.per_page,
             'total': paginated_dids.total,
             'pages': paginated_dids.pages
         })
         return jsonify(result), 200
     except Exception as e:
+        # Catching the error here
         current_app.logger.exception(f"Unexpected error fetching DIDs for user {current_user.id}: {e}")
         abort(500, description="Could not fetch DIDs.")
-
 
 @seller_dids_bp.route('/<int:did_id>', methods=['GET'])
 @seller_required

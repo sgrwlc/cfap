@@ -40,26 +40,34 @@ def admin_create_client():
         return jsonify(err.messages), 400
 
     # Extract client and PJSIP data parts
+    # Data HAS BEEN DESERIALIZED, use the Python field names
     client_data = {k: v for k, v in data.items() if k != 'pjsip'}
-    pjsip_data = data.get('pjsip', {}) # Should always be present due to schema requirement
+    pjsip_data = data.get('pjsip', {})
 
-    # --- Add validation: Ensure nested PJSIP IDs match client_identifier ---
-    client_identifier = client_data.get('clientIdentifier')
-    if pjsip_data.get('endpoint', {}).get('id') != client_identifier:
-         return jsonify({"pjsip.endpoint.id": ["Endpoint ID must match clientIdentifier."]}), 400
-    if pjsip_data.get('aor', {}).get('id') != client_identifier:
-         return jsonify({"pjsip.aor.id": ["AOR ID must match clientIdentifier."]}), 400
+    # --- Corrected validation ---
+    # Get the identifier using the PYTHON field name from the deserialized data
+    client_identifier_value = client_data.get('client_identifier')
+    if not client_identifier_value: # Check if it was actually present after deserialization
+        # This case shouldn't happen if schema requires it, but good practice
+        return jsonify({"client_identifier": ["This field is required."]}), 400
+
+    if pjsip_data.get('endpoint', {}).get('id') != client_identifier_value:
+        return jsonify({"pjsip.endpoint.id": [f"Endpoint ID must match client_identifier ('{client_identifier_value}')."]}), 400
+    if pjsip_data.get('aor', {}).get('id') != client_identifier_value:
+        return jsonify({"pjsip.aor.id": [f"AOR ID must match client_identifier ('{client_identifier_value}')."]}), 400
     if pjsip_data.get('auth') and pjsip_data['auth'].get('id') is None:
-         return jsonify({"pjsip.auth.id": ["Auth ID is required if auth section is provided."]}), 400
-    # --- End validation ---
+        # This check might be better handled by the PjsipAuthSchema if 'id' is required there
+        return jsonify({"pjsip.auth.id": ["Auth ID is required if auth section is provided."]}), 400
+    # --- End corrected validation ---
 
     try:
         creator_id = current_user.id
+    # IMPORTANT: Pass client_data which uses Python field names to the service
         new_client = ClientService.create_client_with_pjsip(
             creator_user_id=creator_id,
-            client_data=client_data,
+            client_data=client_data, # Pass the dict with 'client_identifier'
             pjsip_data=pjsip_data
-        )
+    )
         # Serialize response (includes nested PJSIP data)
         return jsonify(client_schema.dump(new_client)), 201 # Created
     except ValueError as e:
@@ -81,13 +89,15 @@ def admin_get_clients():
 
     try:
         paginated_clients = ClientService.get_all_clients(page=page, per_page=per_page, status=status)
+        # --- VERIFY THIS DICTIONARY ---
         result = client_list_schema.dump({
             'items': paginated_clients.items,
             'page': paginated_clients.page,
-            'perPage': paginated_clients.per_page,
+            'per_page': paginated_clients.per_page, # <<< Ensure this key is 'per_page' (attribute name)
             'total': paginated_clients.total,
             'pages': paginated_clients.pages
         })
+        # --- END VERIFICATION ---
         return jsonify(result), 200
     except Exception as e:
         current_app.logger.exception(f"Unexpected error fetching clients: {e}")

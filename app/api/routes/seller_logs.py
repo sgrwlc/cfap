@@ -111,7 +111,7 @@ def seller_get_call_logs():
         result = call_log_list_schema.dump({
             'items': paginated_logs.items,
             'page': paginated_logs.page,
-            'perPage': paginated_logs.per_page,
+            'per_page': paginated_logs.per_page,
             'total': paginated_logs.total,
             'pages': paginated_logs.pages
         })

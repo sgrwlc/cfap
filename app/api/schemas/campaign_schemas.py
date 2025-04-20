@@ -65,21 +65,24 @@ class SetCampaignDidsSchema(Schema):
     did_ids = fields.List(fields.Int(), required=True, data_key="didIds")
 
 # Schema for adding/updating a client link to a campaign
+# cfap/app/api/schemas/campaign_schemas.py
 class CampaignClientSettingInputSchema(Schema):
     # Allow partial updates for PUT, required fields for POST validated in route
     class Meta:
         unknown = EXCLUDE
-    client_id = fields.Int(required=True, data_key="clientId") # Required for POST
+    # These fields are implicitly required by Marshmallow unless specified otherwise
+    client_id = fields.Int(required=True, data_key="clientId") # Required!
     status = fields.Str(load_default='active', validate=validate.OneOf(['active', 'inactive']))
-    max_concurrency = fields.Int(required=True, validate=validate.Range(min=1), data_key="maxConcurrency") # Required for POST
+    max_concurrency = fields.Int(required=True, validate=validate.Range(min=1), data_key="maxConcurrency") # Required!
     total_calls_allowed = fields.Int(allow_none=True, data_key="totalCallsAllowed", validate=validate.Range(min=0))
-    forwarding_priority = fields.Int(required=True, data_key="forwardingPriority", validate=validate.Range(min=0)) # Required for POST
-    weight = fields.Int(required=True, validate=validate.Range(min=1)) # Required for POST
+    forwarding_priority = fields.Int(required=True, data_key="forwardingPriority", validate=validate.Range(min=0)) # Required!
+    weight = fields.Int(required=True, validate=validate.Range(min=1)) # Required!
 
 # Schema for campaign list pagination response
 class CampaignListSchema(Schema):
-    items = fields.List(fields.Nested(CampaignSchema(exclude=("client_settings", "dids"))), required=True) # Exclude details in list view
+    items = fields.List(fields.Nested(CampaignSchema(exclude=("client_settings", "dids"))), required=True)
     page = fields.Int(required=True)
-    per_page = fields.Int(required=True, data_key="perPage")
+    # Rename field, map attribute
+    perPage = fields.Int(required=True, attribute="per_page") # <-- APPLY FIX HERE
     total = fields.Int(required=True)
     pages = fields.Int(required=True)
