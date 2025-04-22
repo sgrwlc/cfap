@@ -5,7 +5,7 @@ Admin API Routes for Client (Call Center) and PJSIP Management.
 from flask import Blueprint, request, jsonify, current_app, abort
 from marshmallow import ValidationError
 from flask_login import current_user # Needed to get creator_user_id
-
+from app.extensions import db
 from app.services.client_service import ClientService
 from app.utils.decorators import admin_required # Use admin decorator (or staff_required if applicable)
 from app.api.schemas.client_schemas import (
@@ -159,16 +159,34 @@ def admin_update_client(client_id):
 def admin_delete_client(client_id):
     """Admin: Delete a client and its PJSIP config."""
     try:
-        success = ClientService.delete_client(client_id)
-        if success:
-            return '', 204 # No Content
+        # Call the service. It will return True on success
+        # or raise ValueError on failure (not found, linked, db error).
+        ClientService.delete_client(client_id)
+        # If service call completes without exception, deletion was successful
+        return '', 204 # No Content
+
+    except ValueError as e: # Catch specific ValueErrors raised by the service
+        error_message = str(e)
+        # Log as warning because these are expected application/data logic errors
+        current_app.logger.warning(f"Admin delete client error for ID {client_id}: {error_message}")
+        # Determine status code based on error message content
+        if 'not found' in error_message.lower():
+            status_code = 404
+        elif 'linked to active campaigns' in error_message.lower():
+            status_code = 409 # Conflict
+        elif 'database error' in error_message.lower(): # Catch commit errors from service
+             status_code = 500
         else:
-             # Should not happen if service raises ValueError
-             abort(500, description="Client deletion failed for an unknown reason.")
-    except ValueError as e: # Catches not found, linked to active campaign, or DB errors
-        current_app.logger.error(f"Admin delete client error for ID {client_id}: {e}")
-        status_code = 404 if 'not found' in str(e) else (409 if 'linked to active campaigns' in str(e) else 500)
-        abort(status_code, description=str(e))
-    except Exception as e:
-        current_app.logger.exception(f"Unexpected error deleting client {client_id}: {e}")
-        abort(500, description="Could not delete client.")
+            # Treat other ValueErrors as potential bad requests if not categorized
+            status_code = 400 # Default to 400 for uncategorized ValueErrors
+        abort(status_code, description=error_message)
+
+    except Exception as e: # Catch truly unexpected errors (not ValueErrors)
+        current_app.logger.exception(f"Unexpected error during client deletion process for ID {client_id}: {e}")
+        # Ensure rollback for safety in case service failed before rollback
+        try:
+            db.session.rollback()
+            current_app.logger.info(f"Rolled back session after unexpected error during client delete for ID {client_id}")
+        except Exception as rb_err:
+            current_app.logger.error(f"Error during rollback after exception in delete client route for ID {client_id}: {rb_err}")
+        abort(500, description="Could not delete client due to an internal server error.")

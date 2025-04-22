@@ -4,7 +4,7 @@
 import os
 from flask import Flask, jsonify
 from dotenv import load_dotenv
-
+import logging
 from .config import config
 from .extensions import db, migrate, bcrypt, login_manager
 
@@ -24,7 +24,16 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
-
+    
+    # --- Add Log Level Configuration ---
+    if app.config.get('LOG_LEVEL'):
+         app.logger.setLevel(app.config['LOG_LEVEL'])
+    elif app.debug:
+         app.logger.setLevel(logging.DEBUG)
+    else:
+         app.logger.setLevel(logging.INFO)
+    # --- End Log Level Configuration ---
+    
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)

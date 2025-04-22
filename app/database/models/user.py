@@ -19,7 +19,7 @@ class UserModel(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(10), nullable=False, index=True) # 'admin', 'staff', 'user'
-    status = db.Column(db.String(15), nullable=False, default='active', index=True) # 'active', 'inactive', 'pending_approval', 'suspended'
+    status = db.Column(db.String(20), nullable=False, default='active', index=True) # 'active', 'inactive', 'pending_approval', 'suspended'
     full_name = db.Column(db.String(100), nullable=True)
     company_name = db.Column(db.String(100), nullable=True)
     created_at = db.Column(db.TIMESTAMP(timezone=True), nullable=False, server_default=func.now())

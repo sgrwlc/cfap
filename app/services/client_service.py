@@ -4,18 +4,17 @@ Client Service
 Handles business logic for managing Clients (Call Centers) and their
 associated PJSIP configurations required for Asterisk ARA.
 """
+from sqlalchemy import select, delete, and_ # Import and_
 from sqlalchemy.exc import IntegrityError
-# --- MODIFICATION: Import select, exists, and_ ---
-from sqlalchemy import select, exists, and_
-# --- MODIFICATION: Import Pagination ---
+from flask import current_app # Import current_app for logging
 from flask_sqlalchemy.pagination import Pagination
-
+from sqlalchemy.orm import joinedload
 from app.database.models.client import ClientModel
-# --- MODIFICATION: Import CampaignClientSettingsModel directly for the exists query ---
-from app.database.models.campaign import CampaignClientSettingsModel
 from app.database.models.pjsip import PjsipEndpointModel, PjsipAorModel, PjsipAuthModel
+# --- Added imports needed for the check ---
+from app.database.models.campaign import CampaignModel, CampaignClientSettingsModel
+# --- End added imports ---
 from app.extensions import db
-# from app.utils.exceptions import NotFoundError, ConflictError, ServiceError # Example custom exceptions
 # from app.utils.exceptions import NotFoundError, ConflictError, ServiceError # Example custom exceptions
 
 class ClientService:
@@ -126,7 +125,7 @@ class ClientService:
         # Use options to load related PJSIP data eagerly if often needed together
         # from sqlalchemy.orm import joinedload
         # return ClientModel.query.options(joinedload('*')).get(client_id)
-        return ClientModel.query.get(client_id)
+        return db.session.get(ClientModel, client_id)
 
     @staticmethod
     def get_client_by_identifier(identifier: str) -> ClientModel | None:
@@ -258,48 +257,103 @@ class ClientService:
             raise ValueError(f"Failed to update client due to an unexpected error: {e}")
             # raise ServiceError(f"Failed to update client: {e}")
 
-
     @staticmethod
     def delete_client(client_id: int) -> bool:
         """
         Deletes a client and its associated PJSIP records (via cascade).
+        Prevents deletion if the client is linked via an active setting
+        to an active campaign. Includes DEBUGGING logic using print().
 
         Args:
             client_id (int): The ID of the client to delete.
 
         Returns:
-            bool: True if deletion was successful.
+            bool: True if deletion was successful (always returns True or raises).
 
         Raises:
-            ValueError: If client not found or deletion fails.
-            # Consider NotFoundError, ServiceError
+            ValueError: If client not found, linked to active campaign, or DB error during commit.
         """
-        client = ClientService.get_client_by_id(client_id)
+        client = db.session.get(ClientModel, client_id)
         if not client:
             raise ValueError(f"Client with ID {client_id} not found.")
-            # raise NotFoundError(f"Client with ID {client_id} not found.")
 
-        # Add checks here? e.g., prevent deletion if linked to active campaign_client_settings?
-        active_links = db.session.query(db.exists().where(
-            db.and_(
-                CampaignClientSettingsModel.client_id == client_id,
-                CampaignClientSettingsModel.status == 'active'
-            )
-        )).scalar()
+        # --- DEBUGGING LOGS using print() ---
+        print(f"\nDEBUG: Attempting delete for Client ID: {client_id} (Identifier: {client.client_identifier})")
 
-        if active_links:
-            raise ValueError(f"Cannot delete client {client_id} because it is linked to active campaigns. Deactivate links first.")
-            # raise ConflictError(...)
-
-        session = db.session
+        # Check related CampaignClientSettings
+        settings_links = []
         try:
-            # Deleting the client will cascade delete related PJSIP records
-            # due to `cascade="all, delete-orphan"` and `ondelete='CASCADE'` in models
-            session.delete(client)
-            session.commit()
-            return True
+            settings_links = db.session.query(CampaignClientSettingsModel).filter(
+                CampaignClientSettingsModel.client_id == client_id
+            ).options(
+                # Eager load campaign for status check below
+                joinedload(CampaignClientSettingsModel.campaign)
+            ).all()
         except Exception as e:
-            session.rollback()
-            # Log error e
-            raise ValueError(f"Failed to delete client due to an unexpected error: {e}")
-            # raise ServiceError(f"Failed to delete client: {e}")
+            # Use print for exception here too during debugging
+            import traceback
+            print(f"\nDEBUG: Error querying CampaignClientSettings links for Client ID {client_id}: {e}")
+            traceback.print_exc() # Print full traceback
+            raise ValueError(f"Could not verify campaign links before deleting client {client_id}.")
+
+        print(f"\nDEBUG: Found {len(settings_links)} CampaignClientSettings links for Client ID {client_id}.")
+        link_is_active_to_active_campaign = False # Flag to track if blocking condition met
+
+        for link in settings_links:
+             campaign = link.campaign # Access eager-loaded campaign
+             campaign_status = getattr(campaign, 'status', 'N/A')
+             print(
+                 f"DEBUG:   - Link ID: {link.id}, Link Status: {link.status}, "
+                 f"Campaign ID: {link.campaign_id}, Campaign Status: {campaign_status}"
+             )
+             # Check the actual condition we care about
+             if link.status == 'active' and campaign_status == 'active':
+                 link_is_active_to_active_campaign = True
+                 print(f"DEBUG:   ^^^ Blocking condition met by Link ID {link.id}")
+
+
+        # Optional: Log the result of the intended complex check
+        try:
+            q_complex = db.session.query(CampaignClientSettingsModel.id)\
+                .join(CampaignModel, CampaignClientSettingsModel.campaign_id == CampaignModel.id)\
+                .filter(CampaignClientSettingsModel.client_id == client_id)\
+                .filter(CampaignClientSettingsModel.status == 'active')\
+                .filter(CampaignModel.status == 'active')\
+                .exists()
+            complex_check_result = db.session.query(q_complex).scalar()
+            print(f"\nDEBUG: Result of COMPLEX check query for active/active link: {complex_check_result}")
+        except Exception as e:
+            print(f"\nDEBUG: Error running complex check query: {e}")
+
+
+        # Use the flag set during iteration for blocking deletion
+        if link_is_active_to_active_campaign:
+             # Optional: Log the specific campaign IDs if helpful for debugging
+             try:
+                 linked_campaign_ids = [link.campaign_id for link in settings_links if link.status == 'active' and getattr(link.campaign, 'status', 'N/A') == 'active']
+                 ids_str = ', '.join(map(str, linked_campaign_ids))
+                 msg = f"Cannot delete client {client_id}. It is actively linked to active campaigns (IDs: [{ids_str}]). Deactivate campaigns or links first."
+                 print(f"\nDEBUG: Preventing deletion of Client ID {client_id}. Linked via active settings to active Campaign IDs: [{ids_str}]")
+             except Exception: # Fallback if constructing message fails
+                  msg = f"Cannot delete client {client_id} because it is linked to active campaigns. Deactivate links first."
+                  print(f"\nDEBUG: Preventing deletion of Client ID {client_id}. Linked via active settings to active Campaign(s).")
+             raise ValueError(msg)
+        # --- END DEBUGGING ---
+
+
+        # Proceed with deletion if checks pass
+        print(f"\nDEBUG: Proceeding with deletion for Client ID: {client_id} as no active links to active campaigns were found.")
+        session = db.session # Use alias for clarity
+        try:
+            session.delete(client)
+            session.commit() # Try to commit
+            print(f"\nDEBUG: Successfully committed deletion of Client ID {client_id}.")
+            return True # Return True ONLY after successful commit
+        except Exception as e:
+            session.rollback() # Rollback on ANY exception during delete/commit
+            # Use print for exception here too during debugging
+            import traceback
+            print(f"\nDEBUG: Database error during deletion commit for Client ID {client_id}: {e}")
+            traceback.print_exc() # Print full traceback
+            # Re-raise as a ValueError or a more specific custom Exception
+            raise ValueError(f"Failed to commit client deletion due to database error.")

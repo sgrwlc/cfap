@@ -1,164 +1,256 @@
 # -*- coding: utf-8 -*-
-"""Defines fixtures for tests."""
-import pytest
-import logging
-from flask_login import login_user # To help with login fixtures
+"""Defines fixtures for pytest tests."""
 
-from app import create_app # Your app factory
-from app.extensions import db as _db # Use _db to avoid pytest fixture name clash
-from app.database.models.user import UserModel # Import user model for fixtures
+import pytest
+import os
+import subprocess # Import subprocess module
+import sys
+
+# Ensure correct app path is recognized if running pytest from root
+# sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from app import create_app # Import the app factory
+from app.extensions import db as _db # Import the db instance from extensions
+# Import models to ensure tables are known to metadata when create_all is called
+# and potentially for use in other fixtures
+from app.database.models import *
+
+
+# ---- Application Fixtures ----
 
 @pytest.fixture(scope='session')
 def app():
-    """Session-wide test `Flask` application."""
-    _app = create_app(config_name='testing') # Use testing config
-
-    # Establish an application context before running the tests
-    ctx = _app.app_context()
-    ctx.push()
-
-    yield _app # controllers can import this fixture
-
-    ctx.pop()
-
-
-@pytest.fixture(scope='session')
-def db(app):
-    """Session-wide test database."""
-    # Configure logging for tests if needed
-    # logging.basicConfig(level=logging.DEBUG) # Example
-
-    # Ensure the test database is clean before the session
-    _db.app = app # Associate db instance with the test app
-    with app.app_context():
-         # _db.drop_all() # Optional: Drop tables if they somehow exist
-         _db.create_all() # Create tables based on models
-
-    yield _db
-
-    # Teardown: drop all tables after the test session finishes
-    with app.app_context():
-        _db.drop_all()
-
-
-@pytest.fixture(scope='function')
-def session(db):
     """
-    Creates a new database session for a test, ensuring rollback.
-    Uses the db.session provided by Flask-SQLAlchemy but manages
-    the transaction lifecycle for test isolation.
+    Session-wide test Flask application.
+    Uses 'testing' configuration.
     """
-    with db.engine.connect() as connection:
-        with connection.begin() as transaction:
-            # Bind the existing scoped session to this transaction/connection
-            # This ensures db.session uses our isolated transaction
-            db.session.configure(bind=connection)
+    # Force TESTING config regardless of environment variables for safety
+    _app = create_app(config_name='testing')
 
-            # Start a SAVEPOINT
-            nested_transaction = connection.begin_nested()
-
-            # Make the current session available to event listeners if needed
-            @db.event.listens_for(db.session, "after_transaction_end")
-            def end_savepoint(session, transaction):
-                nonlocal nested_transaction
-                if (
-                    not nested_transaction.is_active
-                    and transaction.is_active
-                ):
-                    nested_transaction = connection.begin_nested()
+    # Establish an application context before running tests
+    # This makes app and g available to fixtures and tests
+    with _app.app_context():
+        yield _app
 
 
-            # --- Provide the session to the test ---
-            yield db.session
-            # --- Test runs here ---
-
-
-            # --- Teardown ---
-            # Rollback the database state to the SAVEPOINT created before the test ran
-            # Effectively discarding changes made by the test
-            db.session.remove() # Remove the session, releasing the connection
-            transaction.rollback() # Rollback the main transaction for the test
-            # Connection is automatically closed by the 'with' statement
-
-
-@pytest.fixture(scope='function')
-def client(app, session): # Use the session fixture to ensure context
-    """Get a Flask test client."""
+@pytest.fixture(scope='function') # Function scope for clean client state per test
+def client(app):
+    """
+    A test client for the Flask application.
+    Provides methods like client.get(), client.post(), etc.
+    """
     return app.test_client()
 
 
-# --- Helper Fixtures for Creating Test Data ---
+# ---- Database Fixtures ----
+# This setup uses a session-scoped DB (tables created/dropped once)
+# and loads sample data once per session.
+# Test functions use a function-scoped transaction fixture ('session') for isolation.
+
+@pytest.fixture(scope='session')
+def db(app):
+    """
+    Session-wide test database instance.
+    Creates tables and loads sample data once per session, drops tables afterwards.
+    """
+    with app.app_context():
+        print("\n--- Setting up session-scoped test DB ---")
+        # Drop existing tables (if any from previous failed runs) and create fresh
+        _db.drop_all()
+        _db.create_all()
+        print("--- Test DB tables created ---")
+
+        # --- Load Sample Data After Table Creation ---
+        # Construct path relative to conftest.py (assuming conftest.py is in tests/)
+        # Adjust if your sample data is elsewhere
+        sample_data_path = os.path.join(os.path.dirname(__file__), '..', 'sample_data.sql')
+        # Get DB URI from Flask app config (should be TestingConfig's URI)
+        db_uri = app.config.get('SQLALCHEMY_DATABASE_URI')
+
+        if not db_uri:
+             print("ERROR: SQLALCHEMY_DATABASE_URI not found in app config for sample data loading.")
+             pytest.fail("SQLALCHEMY_DATABASE_URI not configured for testing.")
+
+        if os.path.exists(sample_data_path):
+            print(f"--- Loading sample data from: {sample_data_path} ---")
+            try:
+                # Use subprocess to run psql command
+                # This assumes 'psql' is in the system's PATH
+                # It relies on psql being able to parse the full db_uri directly
+                env = os.environ.copy()
+                # Avoid exposing password in logs if possible - psql should handle URI securely
+                # If password contains special characters requiring separate args: parse uri carefully
+
+                result = subprocess.run(
+                    ['psql', db_uri, '-v', 'ON_ERROR_STOP=1', '-f', sample_data_path], # Added -v ON_ERROR_STOP=1
+                    capture_output=True, text=True, check=True, env=env, timeout=30 # Added timeout
+                )
+                print("--- Sample data loaded successfully. psql Output: ---")
+                # Only print stdout/stderr if they contain something relevant
+                if result.stdout and 'ERROR' not in result.stdout:
+                    print(result.stdout)
+                if result.stderr:
+                     print(f"--- psql stderr (potentially ignorable notices): --- \n{result.stderr}")
+
+            except FileNotFoundError:
+                print("ERROR: 'psql' command not found. Make sure PostgreSQL client tools are installed and in your PATH.")
+                pytest.fail("'psql' command not found.")
+            except subprocess.TimeoutExpired:
+                 print("ERROR: psql command timed out loading sample data.")
+                 pytest.fail("psql command timed out.")
+            except subprocess.CalledProcessError as e:
+                print("ERROR: Failed to load sample data using psql.")
+                print(f"Command: {' '.join(e.cmd)}") # Log the command safely
+                print(f"Return Code: {e.returncode}")
+                print(f"stdout:\n{e.stdout}")
+                print(f"stderr:\n{e.stderr}")
+                pytest.fail("Failed to load sample data via psql. Check errors above.")
+            except Exception as e:
+                print(f"ERROR: An unexpected error occurred during sample data loading: {e}")
+                pytest.fail(f"Unexpected error loading sample data: {e}")
+        else:
+             print(f"WARNING: Sample data file not found at {sample_data_path}. Skipping data load.")
+        # --- End Sample Data Loading ---
+
+        yield _db # Provide the db instance to tests that need it directly
+
+        # Teardown: drop all tables after the test session finishes
+        print("\n--- Tearing down session-scoped test DB ---")
+        _db.drop_all()
+        print("--- Test DB tables dropped ---")
+
 
 @pytest.fixture(scope='function')
-def make_user(session): # Takes the main session fixture
-    """Factory fixture to create user instances."""
-    def _make_user(**kwargs):
-        defaults = {
-            "username": "testuser",
-            "email": "test@test.com",
-            "password": "password123",
-            "role": "user",
-            "status": "active",
-        }
-        final_kwargs = {**defaults, **kwargs}
+def session(app, db): # Depends on app and db fixtures
+    """
+    Function-scoped database session fixture.
+    Uses the standard Flask-SQLAlchemy session proxy but wraps test
+    execution in a transaction that is rolled back. Provides test isolation.
+    """
+    with app.app_context():
+        connection = db.engine.connect()
+        transaction = connection.begin()
+        # Optional: Use nested transaction if DB supports SAVEPOINTs
+        # transaction = connection.begin_nested()
 
-        # --- Check for existing user BEFORE adding ---
-        # This check might still be useful if tests create users directly
-        # but the primary issue was the commit. Let's keep it for now.
-        existing_user = UserModel.query.filter_by(username=final_kwargs['username']).one_or_none()
-        if existing_user:
-            # Instead of failing, let's just return the existing user if found during setup?
-            # Or ensure tests use unique names. For now, let's try allowing it.
-            # pytest.fail(f"Test setup error: Username {final_kwargs['username']} already exists.")
-            return existing_user # Return existing if found
+        # Bind the application's scoped session to the transaction connection
+        db.session.configure(bind=connection)
+        # Start the session context
+        db.session.begin_nested() # Use nested session context to work with the transaction correctly
 
-        existing_email = UserModel.query.filter_by(email=final_kwargs['email']).one_or_none()
-        if existing_email:
-            # pytest.fail(f"Test setup error: Email {final_kwargs['email']} already exists.")
-            return existing_email # Return existing if found
+        # Optional: Reduce print noise if things are working
+        # print("\n--- DB function session transaction started ---")
 
-        user = UserModel(**final_kwargs)
-        session.add(user)
-        # --- REMOVED session.commit() ---
-        # Flush to assign ID if needed immediately, but usually not required
-        session.flush()
-        return user
-    return _make_user
+        # Add listener to detect unexpected commits within tests
+        @sqlalchemy.event.listens_for(db.session, "after_transaction_end")
+        def end_savepoint(session, transaction):
+            if transaction.nested and not transaction._parent.nested:
+                print("\nERROR: Test committed transaction! Changes persisted until session rollback.")
+                # Depending on strictness, you could fail the test here:
+                # pytest.fail("Test committed transaction directly!")
 
-@pytest.fixture(scope='function')
-def admin_user(make_user):
-    """Create an admin user."""
-    return make_user(username='admin_test', email='admin@test.com', role='admin')
+        yield db.session # Provide the transaction-bound session
 
-@pytest.fixture(scope='function')
-def seller_user(make_user):
-    """Create a seller (role='user') user."""
-    return make_user(username='seller_test', email='seller@test.com', role='user')
+        # Teardown
+        db.session.remove() # Close the session, removes from registry
+        transaction.rollback() # Rollback the outer transaction
+        connection.close() # Close the connection
 
-# --- Helper Fixture for Logging In ---
-@pytest.fixture(scope='function')
-def logged_in_client(client, seller_user): # Example logging in as seller
-    """Provides a test client that is already logged in."""
-    # Use the test client's post method to simulate login
-    res = client.post('/api/auth/login', json={
-        'username': seller_user.username,
-        'password': 'password123' # Use the default password from make_user
-    })
-    assert res.status_code == 200 # Ensure login was successful
-    # The client now has the session cookie set
-    yield client
-    # Logout after test (optional, session teardown handles DB state)
-    client.post('/api/auth/logout')
+        # Optional: Reduce print noise if things are working
+        # print("\n--- DB function session transaction rolled back ---")
+
+# ---- Authentication Fixtures (Example - Assuming UserService doesn't commit) ----
 
 @pytest.fixture(scope='function')
-def logged_in_admin_client(client, admin_user): # Example logging in as admin
-    """Provides a test client logged in as admin."""
-    res = client.post('/api/auth/login', json={
-        'username': admin_user.username,
-        'password': 'password123'
-    })
-    assert res.status_code == 200
-    yield client
-    client.post('/api/auth/logout')
+def logged_in_client(client, app, db, session):
+    """
+    Provides a test client logged in as a 'user'.
+    Creates the user if they don't exist within the test session transaction.
+    """
+    # Import service locally within fixture to avoid top-level circular dependencies
+    from app.services.user_service import UserService
+    # UserModel is already imported at the top
 
-# --- Add more fixtures as needed (e.g., creating clients, campaigns) ---
+    test_user_username = "pytest_seller"
+    test_user_email = "pytest@seller.test"
+    test_user_pass = "PytestPass123!"
+
+    # Check if user exists in current transaction context
+    user = session.query(UserModel).filter_by(username=test_user_username).one_or_none()
+
+    if not user:
+         user = UserService.create_user( # This adds to session, doesn't commit
+             username=test_user_username,
+             email=test_user_email,
+             password=test_user_pass,
+             role='user',
+             status='active'
+         )
+         # Flush to get ID if needed, but login uses username
+         # session.flush()
+         print(f"\n--- Created test user '{test_user_username}' (will rollback) for login fixture ---")
+    # else:
+    #      print(f"\n--- Found existing test user '{test_user_username}' in transaction ---")
+
+
+    # Use the test client's context manager for login
+    with client:
+        res = client.post('/api/auth/login', json={
+            'username': test_user_username,
+            'password': test_user_pass
+        })
+        # Robust check: ensure login actually succeeded
+        if res.status_code != 200:
+             print(f"ERROR: Login failed within logged_in_client fixture!")
+             print(f"Response status: {res.status_code}")
+             print(f"Response data: {res.data}")
+             pytest.fail("Login failed within logged_in_client fixture.")
+
+        # print(f"\n--- Logged in client fixture as '{test_user_username}' ---") # Optional noise reduction
+        yield client # Provide the client, now with session cookie
+
+    # print(f"\n--- Logged out client fixture ---") # Optional noise reduction
+
+
+@pytest.fixture(scope='function')
+def logged_in_admin_client(client, app, db, session):
+    """Provides a test client logged in as an admin."""
+    from app.services.user_service import UserService
+    # UserModel is already imported at the top
+
+    test_admin_username = "pytest_admin"
+    test_admin_email = "pytest@admin.test"
+    test_admin_pass = "PytestAdminPass123!"
+
+    admin = session.query(UserModel).filter_by(username=test_admin_username).one_or_none()
+
+    if not admin:
+        admin = UserService.create_user(
+            username=test_admin_username,
+            email=test_admin_email,
+            password=test_admin_pass,
+            role='admin',
+            status='active'
+        )
+        # session.flush()
+        print(f"\n--- Created test admin '{test_admin_username}' (will rollback) for login fixture ---")
+    # else:
+    #      print(f"\n--- Found existing test admin '{test_admin_username}' in transaction ---")
+
+    with client:
+        res = client.post('/api/auth/login', json={
+            'username': test_admin_username,
+            'password': test_admin_pass
+        })
+        if res.status_code != 200:
+             print(f"ERROR: Login failed within logged_in_admin_client fixture!")
+             print(f"Response status: {res.status_code}")
+             print(f"Response data: {res.data}")
+             pytest.fail("Login failed within logged_in_admin_client fixture.")
+
+        # print(f"\n--- Logged in client fixture as '{test_admin_username}' ---") # Optional noise reduction
+        yield client
+    # print(f"\n--- Logged out client fixture ---") # Optional noise reduction
+
+# Import sqlalchemy event listener for session fixture enhancement
+import sqlalchemy

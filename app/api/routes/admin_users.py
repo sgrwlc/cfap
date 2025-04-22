@@ -41,19 +41,26 @@ def admin_create_user():
         return jsonify(err.messages), 400
 
     try:
-        # Call service to create user
+    # Call service to create user (adds to session)
         new_user = UserService.create_user(**data)
-        # Serialize response
-        return jsonify(user_schema.dump(new_user)), 201 # Created
-    except ValueError as e:
-        current_app.logger.error(f"Admin create user error: {e}")
-        # Check for specific errors like duplicates
+        # --- ADD COMMIT LOGIC HERE ---
+        try:
+            db.session.commit() # Commit the transaction initiated by the session fixture
+            # Serialize response AFTER successful commit
+            return jsonify(user_schema.dump(new_user)), 201 # Created
+        except Exception as commit_err:
+            db.session.rollback() # Rollback on commit error
+            current_app.logger.exception(f"Database commit error creating user: {commit_err}")
+            abort(500, description="Database error during user creation.")
+        # --- END COMMIT LOGIC ---
+    except ValueError as e: # Catch errors from service validation/flush
+        current_app.logger.error(f"Admin create user service error: {e}")
         status_code = 409 if 'already exists' in str(e) else 400
         abort(status_code, description=str(e))
-    except Exception as e:
-        current_app.logger.exception(f"Unexpected error creating user: {e}")
-        abort(500, description="Could not create user.")
-
+    # Keep generic exception handler if needed, but commit errors handled above
+    # except Exception as e:
+    #     current_app.logger.exception(f"Unexpected error creating user: {e}")
+    #     abort(500, description="Could not create user.")
 
 @admin_users_bp.route('', methods=['GET'])
 @admin_required

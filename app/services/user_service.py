@@ -52,17 +52,17 @@ class UserService:
         # Commit should ideally happen at the end of the request cycle (in the route handler)
         # But for simplicity in the service for now:
         try:
-             db.session.commit()
-             return new_user
+            db.session.flush()
+            return new_user
         except Exception as e:
-             db.session.rollback()
-             # Log the exception e
-             raise ValueError("Failed to create user due to database error.") # Or re-raise
+             db.session.rollback() # Rollback on flush error
+             # Log error e
+             raise ValueError(f"Failed to flush new user to session: {e}")
 
     @staticmethod
     def get_user_by_id(user_id):
         """Fetches a user by their ID."""
-        return UserModel.query.get(user_id) # Returns None if not found
+        return db.session.get(UserModel, user_id) # Returns None if not found
 
     @staticmethod
     def get_user_by_username(username):
@@ -90,7 +90,7 @@ class UserService:
         Raises:
             ValueError: If user not found or update fails.
         """
-        user = UserService.get_user_by_id(user_id)
+        user = db.session.get(UserModel, user_id)
         if not user:
             raise ValueError(f"User with ID {user_id} not found.")
 
@@ -126,7 +126,7 @@ class UserService:
     @staticmethod
     def change_password(user_id, new_password):
         """Changes a user's password."""
-        user = UserService.get_user_by_id(user_id)
+        user = db.session.get(UserModel, user_id)
         if not user:
             raise ValueError(f"User with ID {user_id} not found.")
 
@@ -154,7 +154,7 @@ class UserService:
         Raises:
             ValueError: If user not found or deletion fails.
         """
-        user = UserService.get_user_by_id(user_id)
+        user = db.session.get(UserModel, user_id)
         if not user:
             raise ValueError(f"User with ID {user_id} not found.")
 
