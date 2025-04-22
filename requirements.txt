@@ -1,0 +1,27 @@
+# requirements.txt - Python dependencies for CapConduit CFAP
+
+# Core Flask
+Flask>=2.0
+
+# Database ORM & Migrations
+Flask-SQLAlchemy>=2.5
+Flask-Migrate>=3.0
+psycopg2-binary # PostgreSQL driver (use psycopg2 if building from source)
+
+# Authentication & Security
+Flask-Login>=0.5
+Flask-Bcrypt>=0.7
+
+# Environment & Configuration
+python-dotenv>=0.19
+
+# WSGI Server (for production)
+gunicorn>=20.0
+
+# API Validation/Serialization (Using Marshmallow)
+marshmallow>=3.0
+Flask-Marshmallow>=0.14 # Integration helper (optional but can be convenient)
+
+# Testing Framework
+pytest>=6.0
+pytest-flask>=1.2

@@ -1,0 +1,2 @@
+Flask-Migrate requires this directory.
+It contains the Alembic migration repository.
