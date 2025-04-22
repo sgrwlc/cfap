@@ -224,10 +224,22 @@ def seller_set_campaign_dids(campaign_id):
             return jsonify({"message": "Campaign DIDs updated successfully."}), 200
         else:
              abort(500, description="Failed to update campaign DIDs for an unknown reason.")
-    except ValueError as e: # Catch service errors (not found, not owned)
-        current_app.logger.error(f"Seller set campaign DIDs service error for campaign {campaign_id}, user {current_user.id}: {e}")
-        status_code = 404 if 'not found' in str(e) else (403 if 'authorized' in str(e) or 'owned' in str(e) else 400)
-        abort(status_code, description=str(e))
+    
+    except ValueError as e:
+        error_message = str(e)
+        current_app.logger.error(f"Seller set campaign DIDs service error for campaign {campaign_id}, user {current_user.id}: {error_message}")
+        # --- Refined Status Code Mapping ---
+        # Treat both "not found" and "not authorized" for the *campaign* as 404 for the user
+        if 'not found or not owned by user' in error_message.lower() or \
+           'not authorized for campaign' in error_message.lower(): # <-- ADDED CHECK
+            status_code = 404 # Treat as Not Found for this user
+        elif 'not owned by the user' in error_message.lower(): # Specific DID ownership error
+            status_code = 403 # Forbidden to use that DID
+        else:
+            status_code = 400 # Other validation errors
+        # --- End Refined Mapping ---
+        abort(status_code, description=error_message)
+
     except Exception as e: # Catch unexpected errors
         current_app.logger.exception(f"Unexpected error setting DIDs for campaign {campaign_id}, user {current_user.id}: {e}")
         abort(500, description="Could not update campaign DIDs due to an internal error.")

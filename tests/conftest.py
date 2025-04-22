@@ -121,42 +121,34 @@ def db(app):
 
 
 @pytest.fixture(scope='function')
-def session(app, db): # Depends on app and db fixtures
+def session(app, db):
     """
-    Function-scoped database session fixture.
-    Uses the standard Flask-SQLAlchemy session proxy but wraps test
-    execution in a transaction that is rolled back. Provides test isolation.
+    Function-scoped database session with automatic rollback via explicit
+    connection and transaction management. Test isolation provider.
     """
     with app.app_context():
+        # Get connection from engine
         connection = db.engine.connect()
+        # Begin a transaction
         transaction = connection.begin()
-        # Optional: Use nested transaction if DB supports SAVEPOINTs
-        # transaction = connection.begin_nested()
 
-        # Bind the application's scoped session to the transaction connection
+        # Use a session bound to this connection
+        # db.session is a proxy, configure it to use our connection
         db.session.configure(bind=connection)
-        # Start the session context
-        db.session.begin_nested() # Use nested session context to work with the transaction correctly
+        # Start the session scope (optional but good practice)
+        # db.session.begin_nested() # Maybe not needed if route commits directly
 
-        # Optional: Reduce print noise if things are working
+        # Optional: Reduce print noise
         # print("\n--- DB function session transaction started ---")
-
-        # Add listener to detect unexpected commits within tests
-        @sqlalchemy.event.listens_for(db.session, "after_transaction_end")
-        def end_savepoint(session, transaction):
-            if transaction.nested and not transaction._parent.nested:
-                print("\nERROR: Test committed transaction! Changes persisted until session rollback.")
-                # Depending on strictness, you could fail the test here:
-                # pytest.fail("Test committed transaction directly!")
 
         yield db.session # Provide the transaction-bound session
 
-        # Teardown
-        db.session.remove() # Close the session, removes from registry
-        transaction.rollback() # Rollback the outer transaction
+        # Teardown: Rollback the transaction and clean up
+        db.session.remove() # Ensure session registry is cleared
+        transaction.rollback() # Rollback the main transaction
         connection.close() # Close the connection
 
-        # Optional: Reduce print noise if things are working
+        # Optional: Reduce print noise
         # print("\n--- DB function session transaction rolled back ---")
 
 # ---- Authentication Fixtures (Example - Assuming UserService doesn't commit) ----

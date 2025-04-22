@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 """
 Schemas for DID API requests and responses (Seller perspective).
 """
@@ -6,7 +7,14 @@ from marshmallow import Schema, fields, validate, EXCLUDE
 
 # Schema for creating a DID
 class CreateDidSchema(Schema):
-    number = fields.Str(required=True)
+    # Add validation using a regex (example: starts with +, then digits)
+    number = fields.Str(
+        required=True,
+        validate=validate.Regexp(
+            r'^\+[1-9]\d{1,14}$', # Simple E.164-like pattern (adjust as needed)
+            error="Invalid phone number format. Must start with '+' and contain only digits (e.g., +15551234567)."
+        )
+    )
     description = fields.Str(allow_none=True)
     status = fields.Str(load_default='active', validate=validate.OneOf(['active', 'inactive']))
 
@@ -14,7 +22,8 @@ class CreateDidSchema(Schema):
 class UpdateDidSchema(Schema):
     class Meta:
         unknown = EXCLUDE # Allow partial updates
-    description = fields.Str(allow_none=True)
+
+    description = fields.Str(allow_none=True, validate=validate.Length(min=1))
     status = fields.Str(validate=validate.OneOf(['active', 'inactive']))
 
 class DidSchema(Schema):

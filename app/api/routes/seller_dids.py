@@ -59,6 +59,12 @@ def seller_get_dids():
     per_page = request.args.get('per_page', 20, type=int)
     status = request.args.get('status', None, type=str)
 
+    # --- ADD VALIDATION FOR STATUS ---
+    allowed_statuses = ['active', 'inactive']
+    if status is not None and status not in allowed_statuses:
+        abort(400, description=f"Invalid status filter. Allowed values: {', '.join(allowed_statuses)}")
+    # --- END VALIDATION ---
+
     try:
         paginated_dids = DidService.get_dids_for_user(
             user_id=current_user.id,

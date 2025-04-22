@@ -206,8 +206,9 @@ def test_admin_create_client_pjsip_id_mismatch(logged_in_admin_client):
     response = logged_in_admin_client.post('/api/admin/clients', json=client_payload)
     assert response.status_code == 400
     data = json.loads(response.data)
-    assert "Endpoint ID must match client_identifier" in data.get('pjsip.endpoint.id', [])[0] # Check Marshmallow error structure
-
+    # Check nested structure
+    assert 'pjsip.endpoint.id' in data.get('errors', {})
+    assert "Endpoint ID must match client_identifier" in data['errors'].get('pjsip.endpoint.id', [])[0]
 
 def test_admin_create_client_missing_pjsip_section(logged_in_admin_client):
     """
@@ -222,7 +223,7 @@ def test_admin_create_client_missing_pjsip_section(logged_in_admin_client):
     response = logged_in_admin_client.post('/api/admin/clients', json=client_payload)
     assert response.status_code == 400
     data = json.loads(response.data)
-    assert 'pjsip' in data # Check Marshmallow error
+    assert 'pjsip' in data.get('errors', {}) # Check 'errors' dict
 
 
 def test_admin_create_client_missing_pjsip_aor_contact(logged_in_admin_client):
@@ -243,7 +244,10 @@ def test_admin_create_client_missing_pjsip_aor_contact(logged_in_admin_client):
     response = logged_in_admin_client.post('/api/admin/clients', json=client_payload)
     assert response.status_code == 400
     data = json.loads(response.data)
-    assert 'contact' in data.get('pjsip', {}).get('aor', {}) # Check nested error
+    # Check nested error structure
+    assert 'pjsip' in data.get('errors', {})
+    assert 'aor' in data['errors'].get('pjsip', {})
+    assert 'contact' in data['errors']['pjsip'].get('aor', {})
 
 # --- Test GET /api/admin/clients/{client_id} ---
 

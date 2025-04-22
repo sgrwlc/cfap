@@ -37,10 +37,17 @@ class CampaignSchema(Schema):
 
     # Nested data for GET requests
     # DIDs associated with this campaign
-    dids = fields.List(fields.Nested(lambda: DidSchema(only=("id", "number", "description", "status"))), dump_only=True)
-    # Client settings/links for this campaign
-    client_settings = fields.List(fields.Nested(CampaignClientSettingSchema()), dump_only=True, data_key="clientSettings")
-
+    dids = fields.List(
+        fields.Nested(lambda: DidSchema(only=("id", "number", "description", "status"))),
+        dump_only=True,
+        dump_default=[] # <-- ADD dump_default=[]
+    )
+    client_settings = fields.List(
+        fields.Nested(CampaignClientSettingSchema()),
+        dump_only=True,
+        data_key="clientSettings",
+        dump_default=[] # <-- ADD dump_default=[]
+    )
 
 # Schema for Creating a Campaign
 class CreateCampaignSchema(Schema):

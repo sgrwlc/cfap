@@ -1,69 +1,87 @@
-AI Replica Instruction Set: CapConduit Project Handoff
-
-Objective: Your objective is to fully assume the role of the primary AI developer for the CapConduit project, effective immediately. You must internalize the project's current state, architecture, goals, and codebase to seamlessly continue development from the exact point documented below. There should be no deviation from the established plan or need to revisit completed phases.
+AI Handoff & Briefing Document: CapConduit Call Platform (v3.0)
+Objective: Fully assume the role of the primary AI developer for the CapConduit project (CFAP codebase). Internalize the project's current state, architecture, goals, and codebase (v3.0 redesign) to seamlessly continue development into the Asterisk+ARA Integration phase.
 
 1. Prerequisite Document Analysis:
 
-You must first thoroughly read and fully assimilate the information contained in the following documents provided alongside this instruction set:
+Thoroughly read and assimilate:
 
-Master Plan: CapConduit Call Platform: Understand the core business logic, value proposition, target users, features (especially call capping mechanisms), business model (manual balance), and overall technical architecture.
-Progress Report: CapConduit Platform Deployment: Understand the sequence of deployment steps completed, the configuration of the remote VM environment, and the verification status of each phase.
-AI Handoff & Briefing Document: CapConduit Call Platform: Synthesizes the current state, technical stack, environment details, and explicitly identifies the next steps.
-Project Files (app.py, schema.sql, sample_data.sql, requirements.txt, .env description, service/nginx configs): These represent the current implementation state.
+Master Plan: CapConduit Call Platform (v3.0 - Redesigned): Understands business logic, user roles, core features (Seller->Client linking, granular caps), ARA focus.
+Progress Report: CapConduit Platform Deployment (v3.0 Update): Details completed phases, current tested state of APIs and services.
+AI Handoff & Briefing Document (This Document): Synthesizes state, outlines next steps.
+Project Files (cfap/ directory): Includes app/ (Flask code), tests/ (Pytest integration tests), configuration files (.env, config.py), DB files (schema_v3.sql, sample_data_v3.sql).
 2. Core Knowledge Internalization:
 
-Project Goal: Recognize that CapConduit's primary function is automated, real-time enforcement of call concurrency and volume caps for Call Sellers routing calls via direct VoIP (SIP/IAX2).
-Key Entities: Understand the roles and interactions of Users (Admin/Seller), DIDs, Campaigns (with Volume Caps), Targets (with Concurrency/Total Caps), Forwarding Rules (linking Campaigns to Targets with strategy), CDRs, Balance Adjustments, Notifications, DID Requests, and System Settings.
-Architecture: Internalize the Nginx -> Gunicorn -> Flask (Python) -> PostgreSQL backend architecture, and its intended interaction with Asterisk via internal APIs.
-Critical APIs: Pay special attention to the functionality of the internal APIs:
-GET /internal_api/route_info: Performs DID lookup, cascading checks (Balance, Campaign Caps, Target Caps), and returns routing data or rejection reasons.
-POST /internal_api/log_cdr: Logs call attempts and performs transactional updates to balance and counters based on call outcome and billability.
-Business Model: Understand the manual pre-payment balance system managed by the Admin and the per-minute billing logic triggered by the log_cdr endpoint.
+Project Goal: Route calls from Sellers' DIDs/Campaigns to specific, pre-registered Call Center Clients via a central Asterisk PBX, enforcing caps defined per Campaign-Client link.
+Key Entities: Users (Admin, Staff, Seller), Clients (Call Centers), DIDs, Campaigns, CampaignClientSettings (CRITICAL: holds link-specific caps/rules), CallLogs, pjsip_* tables (for ARA).
+Architecture: Nginx -> Gunicorn -> Flask (Python/SQLAlchemy) -> PostgreSQL. Asterisk interacts via ARA (reading pjsip_* tables) and Internal API (primarily POST /api/internal/log_call).
+Critical Logic:
+Admins/Staff manage Clients and their PJSIP configs (written to ARA tables).
+Sellers manage Campaigns, DIDs, and link them to Clients via CampaignClientSettings, defining caps/priority/weight per link.
+Asterisk (Dialplan) reads ARA PJSIP data, queries DB/API for Campaign/Settings data, checks caps (GROUP_COUNT + total call check), performs Dial based on strategy/timeout.
+Asterisk (AGI) calls POST /api/internal/log_call on hangup, passing call details and the ID of the specific CampaignClientSetting used.
+Backend API (log_call endpoint) logs CDR and increments current_total_calls on the specific CampaignClientSettings record.
 3. Current State Confirmation (CRITICAL):
 
-You must confirm your understanding that:
+Confirm understanding that:
 
-Development Phases 1 through 10 are 100% complete and tested on the target Google Cloud VM (call-platform-vm-debian, IP 34.59.92.30).
-The backend Flask application (app.py) is fully functional, containing working code for all user-facing APIs, admin APIs, and the critical internal APIs (/internal_api/route_info, /internal_api/log_cdr). There are no known bugs in the backend code.
-The PostgreSQL database (call_platform_db) is running, structured according to schema.sql, and populated with the sample data from sample_data.sql.
-All supporting services (Nginx, Gunicorn, PostgreSQL, Asterisk) are running correctly on the VM.
-The project is exactly poised to begin Phase 11: Asterisk Integration. Do NOT attempt to revisit or modify work from Phases 1-10 unless explicitly instructed due to a newly discovered critical issue related only to Phase 11 implementation.
-4. Immediate Task Identification (Phase 11):
+Infrastructure, DB Schema (v3.0 ARA), Sample Data, Flask App Structure, Service Layer logic are complete.
+All currently implemented API endpoints (Auth, Admin User Mgmt, Admin Client/PJSIP Mgmt, Seller DID Mgmt, Seller Campaign/Link Mgmt, Seller Log View, Internal Log Call) are functionally complete and PASSING their corresponding Pytest integration tests.
+The project is poised to begin Phase 11 (Revised): Asterisk + ARA Integration. Do NOT revisit or modify work on the Flask backend/services/tested APIs unless strictly necessary for Asterisk integration issues.
+4. Immediate Task Identification (Phase 11 Revised: Asterisk + ARA Integration):
 
-Your sole focus is now Phase 11: Asterisk Integration. This involves making the running Asterisk instance interact with the functional backend API. Your tasks are:
+Focus solely on making the Asterisk instance use the database via ARA and interact with the logging API.
 
-Develop AGI Script (routing_lookup.agi):
-Location: /var/lib/asterisk/agi-bin/ on the VM.
-Language: Python 3 (using the same venv: /opt/call_platform/venv/bin/python).
-Functionality: Read agi_dnid, call GET http://127.0.0.1:5000/internal_api/route_info (URL-encode + in DID), parse JSON, set appropriate channel variables (ROUTING_STATUS, REJECT_REASON, target details, limits, rates) for the dialplan.
-Develop AGI Script (cdr_logger.agi):
+A. Configure Asterisk for ARA:
+modules.conf: Ensure res_config_pgsql.so (or MySQL equivalent if used) and res_pjsip_config_wizard.so (optional) are loaded.
+extconfig.conf: Define connection details for pgsql (or mysql) to call_platform_db. Create mappings for pjsip.conf => pgsql,call_platform_db,pjsip_endpoints, pjsip.conf => pgsql,call_platform_db,pjsip_aors, pjsip.conf => pgsql,call_platform_db,pjsip_auths.
+res_pjsip.conf: Define necessary transports (e.g., transport-udp). Ensure endpoint/aor/auth loading points to the realtime backend (e.g., endpoint=config,pjsip.conf,criteria=type=endpoint).
+sorcery.conf: Configure if using configuration wizards, otherwise ensure basic PJSIP objects point to config backend type.
+Verification: Use Asterisk CLI: module load res_config_pgsql.so, realtime load pjsip, pjsip show endpoints, pjsip show aors should show clients defined in the database.
+B. Develop Asterisk Dialplan (extensions.conf):
+Define entry context (e.g., [from-pstn], [from-trunk]).
+Answer()
+Lookup Campaign: Use ODBC_Function (via func_odbc.conf pointing to extconfig.conf connection) or simple AGI script to query DB: SELECT c.id, c.routing_strategy, c.dial_timeout_seconds FROM campaigns c JOIN campaign_dids cd ON c.id = cd.campaign_id JOIN dids d ON cd.did_id = d.id WHERE d.number = '${CHANNEL(dnid)}' AND c.status = 'active' LIMIT 1; Set results to channel variables (e.g., CAMPAIGN_ID, ROUTING_STRATEGY, DIAL_TIMEOUT). Handle no campaign found.
+Fetch Eligible Client Settings: Use ODBC_Function/AGI to query DB: SELECT cs.id, cs.client_id, cs.max_concurrency, cs.total_calls_allowed, cs.current_total_calls, cs.forwarding_priority, cs.weight, cl.client_identifier FROM campaign_client_settings cs JOIN clients cl ON cs.client_id = cl.id WHERE cs.campaign_id = ${CAMPAIGN_ID} AND cs.status = 'active' AND cl.status = 'active' ORDER BY cs.forwarding_priority ASC; Store results perhaps delimited in a channel variable or use complex AGI. Handle no settings found.
+Loop/Select Target:
+Iterate through fetched settings based on ROUTING_STRATEGY (Priority order is default, RR/Weighted needs dialplan logic).
+Check Total Cap: GotoIf($[${SETTING_CURRENT_TOTAL} >= ${SETTING_TOTAL_ALLOWED}]?next_target) (Handle NULL allowed).
+Check Concurrency: Define dynamic group GROUP(ccs-${SETTING_ID}) or GROUP(camp${CAMPAIGN_ID}-client${CLIENT_ID}). Use GotoIf($[${GROUP_COUNT(${GROUP_NAME})} >= ${SETTING_MAX_CC}]?next_target).
+Set Call Group: Set(GROUP()=${GROUP_NAME}).
+Store Attempted Setting ID: Set(EFFECTIVE_CCS_ID=${SETTING_ID}).
+Dial: Dial(PJSIP/${CLIENT_IDENTIFIER},${DIAL_TIMEOUT},ghH) (g: continue on answer, h: run h ext on caller hangup, H: run h ext on callee hangup).
+Handle DIALSTATUS: Check ANSWER, BUSY, NOANSWER, CONGESTION, CHANUNAVAIL. If ANSWER, break loop/goto done. If BUSY/NOANSWER/etc., and strategy allows fallback, continue loop (goto(next_target)). Handle timeout (${HASH(SYSTEMSTATUS)} or DIALSTATUS).
+Hangup() if no target reached.
+Define h extension: Run cdr_logger.agi.
+C. Develop AGI Script (cdr_logger.agi):
 Location: /var/lib/asterisk/agi-bin/.
-Language: Python 3 (using the same venv).
-Functionality: Read relevant Asterisk channel variables on hangup (h extension), calculate billable_duration, construct JSON payload, call POST http://127.0.0.1:5000/internal_api/log_cdr.
-Develop Asterisk Dialplan (extensions.conf):
-Location: /etc/asterisk/extensions.conf (or included files).
-Functionality: Define inbound context, execute routing_lookup.agi, check ROUTING_STATUS, handle rejections, if proceeding loop through targets, check concurrency (GROUP_COUNT vs. variable), execute Dial() with h option, handle DIALSTATUS, define h extension to run cdr_logger.agi.
+Language: Python 3 (/opt/call_platform/venv/bin/python).
+Functionality:
+Import necessary libraries (requests, sys, os, json, datetime). Read AGI variables (agi.get_variable).
+Gather required variables: UNIQUEID, LINKEDID, CHANNEL(dnid), CALLERID(num), CALLERID(name), start/answer/end times (CDR(start), etc.), DIALSTATUS, HANGUPCAUSE, EFFECTIVE_CCS_ID (set in dialplan), User/Campaign/DID IDs (potentially passed from dialplan or re-queried based on DNID if needed).
+Construct JSON payload matching LogCallRequestSchema.
+Read INTERNAL_API_TOKEN from environment or config file accessible to Asterisk user.
+Make POST request to http://127.0.0.1:5000/api/internal/log_call with JSON payload and X-Internal-API-Token header.
+Log success/failure of API call.
 5. Execution Mindset & Approach:
 
-Follow the Plan: Adhere strictly to the steps outlined for Phase 11.
-Incremental Development & Testing: Develop the AGI scripts first. Test them individually using Asterisk CLI commands (agi set debug on, channel originate Local/... exec AGI ...) before integrating fully into the dialplan. Test the dialplan logic step-by-step.
-Consistency: Maintain coding style and patterns established in app.py when writing the Python AGI scripts. Utilize existing helper functions if applicable by structuring the AGI scripts appropriately or adding shared utility modules.
-Security: Remember the internal APIs are currently only protected by basic IP checks (if uncommented). Assume calls to them originate from 127.0.0.1 (Asterisk on the same server). Ensure AGI scripts have correct execute permissions (chmod +x) and are owned by the asterisk user/group if necessary for execution by Asterisk.
-Error Handling: Implement robust error handling within the AGI scripts (e.g., handling failed API calls, invalid JSON responses) and within the dialplan (e.g., handling AGI failures, different DIALSTATUS results).
-Logging: Utilize Asterisk's Verbose() and NoOp() dialplan applications and Python's logging within AGI scripts to trace execution flow during development and debugging.
+Strict adherence to Phase 11 Revised plan.
+Incremental Testing: Configure ARA first, test with CLI. Develop dialplan context by context, test lookups. Develop AGI, test standalone then in h extension. Use agi set debug on.
+Consistency: Match Python style.
+Security: Ensure AGI script runs as asterisk user if needed, protect API token. Set file permissions (chmod +x).
+Error Handling: Robust checks in dialplan (GotoIf, Hangup) and AGI (try...except).
+Logging: Use Asterisk Verbose/NoOp and Python logging within AGI.
 6. Key Context Variables:
 
-Internal API Base URL: http://127.0.0.1:5000
-AGI Script Directory: /var/lib/asterisk/agi-bin/
-Asterisk Config Directory: /etc/asterisk/
-Database/Usernames: Refer to sample_data.sql and .env.
+Internal Log API: http://127.0.0.1:5000/api/internal/log_call
+DB Connection for ARA: Defined in extconfig.conf (using details from .env).
+AGI Directory: /var/lib/asterisk/agi-bin/
+Asterisk Config Dir: /etc/asterisk/
 7. Interaction Protocol:
 
-Proceed with implementing Phase 11, starting with routing_lookup.agi.
-Present code for review.
-If you encounter discrepancies between the documentation and expected behavior, or require clarification on Asterisk implementation details, ask the user for specific guidance.
-Report any unexpected errors encountered during execution.
+Proceed with configuring Asterisk ARA (extconfig.conf, res_config_pgsql, res_pjsip, sorcery). Present config files for review.
+Develop dialplan logic. Present extensions.conf changes.
+Develop cdr_logger.agi script. Present script.
+Report issues encountered during Asterisk configuration or testing.
 8. Confirmation:
 
-Before generating any AGI scripts or dialplan configuration, please confirm:
-"I have processed the Master Plan, Progress Report, Handoff Document, and understand the project structure from the provided files. I confirm the backend API (Phase 10) is complete and tested. My primary and immediate focus is Phase 11: Asterisk Integration, starting with the development of the routing_lookup.agi script."
+Before generating Asterisk configs, confirm: "I have processed the updated Master Plan, Progress Report, and Handoff Document. I confirm the backend API and database (v3.0) are complete and tested via Pytest. My immediate focus is Phase 11 (Revised): Configuring Asterisk for ARA using PostgreSQL and developing the corresponding dialplan and logging AGI script."

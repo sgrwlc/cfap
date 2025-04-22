@@ -1,128 +1,79 @@
-Okay, here is a detailed progress report on the CapConduit platform deployment, summarizing what has been accomplished and outlining the immediate next steps.
-
-Project: CapConduit Call Platform
-Date: April 11/12, 2025 (Based on logs)
-Current Phase: End of Phase 10 / Beginning of Phase 11
+Progress Report: CapConduit Platform Deployment (v3.0 Update)
+Project: CapConduit Call Platform (Redesigned ARA Focus)
+Date: April 22, 2025 (Based on last test results)
+Current Phase: End of API Layer Testing / Beginning of Asterisk+ARA Integration
 
 1. Overall Summary / Current Status:
 
-The CapConduit project deployment has successfully completed the setup of the cloud infrastructure, installation and configuration of all core software components, and the full development and testing of the backend API application. The database schema is implemented and populated with sample data. The platform's core business logic for call routing, capping, and accounting resides within the now-functional backend APIs.
+The redesigned CapConduit project deployment has successfully completed cloud infrastructure setup, core software installation/configuration, and the full development and testing of the backend API application adhering to the v3.0 schema. The database schema is implemented using Flask-Migrate and populated with sample data. The platform's core business logic resides within the functional Service layer, exposed via tested APIs for Admins, Sellers, and internal processes. Pytest integration tests cover all implemented API endpoints (Auth, Admin, Seller).
 
-The project is now fully prepared to transition into Phase 11: Asterisk Integration, where the telephony engine will be configured to utilize the backend APIs for real-time call processing.
+The project is now fully prepared to transition into the Asterisk Integration phase, focusing on configuring Asterisk to use Asterisk Realtime Architecture (ARA) with the PostgreSQL backend and implementing the necessary dialplan logic.
 
 2. Completed Phases & Milestones:
 
-Phase 1-2: Infrastructure Setup & Initial Server Configuration (Complete)
-Google Cloud VM (call-platform-vm-debian) provisioned with Debian 12.
-Static external IP (34.59.92.30) assigned.
-DNS A record for forwarding.realpropbx.com configured pointing to the static IP.
-GCP firewall rules created for necessary ports (SSH, HTTP, HTTPS, SIP, RTP).
-Base OS updated and essential tools installed.
-UFW (local firewall) configured and enabled.
-Fail2Ban installed and configured for basic security.
-Phase 3: Asterisk Installation (Complete)
-Asterisk 20 successfully compiled from source.
-Dependencies installed.
-Modules selected (including PJSIP).
-Asterisk installed with sample configurations.
-Systemd service configured.
-Dedicated asterisk user/group created and permissions set.
-Asterisk service is running under the asterisk user.
-Phase 4: PostgreSQL Database Installation (Complete)
-PostgreSQL installed and service running.
-Database (call_platform_db) created.
-Application user (call_platform_user) created with a secure password and necessary privileges.
-Phase 5: Nginx Web Server Installation (Complete)
-Nginx installed and service running.
-Verified basic access via IP address.
-Phase 6: Python & Flask Environment Setup (Complete)
-Python 3, pip, and venv installed on the remote VM.
-Project directory (/opt/call_platform) created with correct ownership (sudhanshu:sudhanshu).
-Python virtual environment (/opt/call_platform/venv) created and activated.
-Required Python libraries (Flask, gunicorn, psycopg2-binary, Flask-Bcrypt, Flask-Login, python-dotenv, decimal) installed via requirements.txt.
-Remote .env file created/verified with production database credentials, production FLASK_ENV setting, and a unique SECRET_KEY.
-Phase 7: Nginx Reverse Proxy Configuration (Complete)
-Nginx server block created for forwarding.realpropbx.com.
-Configuration set up to proxy requests to the backend Gunicorn application (running on 127.0.0.1:8000).
-Site enabled, default site disabled (if applicable).
-Nginx configuration tested and service restarted.
-Phase 8: Backend Application Service (Gunicorn + Systemd) (Complete)
-Systemd service file (call_platform.service) created to manage the Gunicorn process.
-Service configured to run as the sudhanshu user, pointing to the correct virtual environment and Flask app (app:app).
-Service enabled and started successfully. Verified that Nginx proxies requests correctly to the running Flask app.
-Phase 9: Database Schema Design & Implementation (Complete)
-Detailed PostgreSQL schema (schema.sql) defined with all necessary tables, columns, relationships, constraints, and indexes.
-Schema successfully applied to the call_platform_db database.
-Permissions granted to call_platform_user on all application tables and sequences.
-Sample data (sample_data.sql) created and successfully loaded into the database, providing a consistent state for testing.
-Phase 10: Backend API Development (Complete)
-Flask application (app.py) fully developed with necessary structure (DB pool, helpers, logging, extensions).
-User Authentication (Login/Register/Logout) implemented and verified.
-User-Facing API Endpoints Implemented & Tested:
-Campaigns (/api/campaigns, /api/campaigns/<id>, /api/campaigns/<id>/dids)
-Targets (/api/targets, /api/targets/<id>)
-Forwarding Rules (/api/forwarding_rules, /api/forwarding_rules/<id>)
-DIDs (GET /api/dids, POST /api/did_requests)
-CDRs (GET /api/cdrs)
-Notifications (GET /api/notifications, PUT /api/notifications/<id>/read)
-Admin API Endpoints Implemented & Tested:
-User Management (/admin/users, /admin/users/<id>)
-Balance Adjustment (POST /admin/balance)
-DID Request Management (GET /admin/did_requests, PUT /admin/did_requests/<id>/process)
-DID Inventory Management (/admin/dids, /admin/dids/<id>)
-System Settings (GET /admin/settings, PUT /admin/settings/<key>)
-Internal API Endpoints Implemented & Tested:
-GET /internal_api/route_info: Core logic for DID lookup, user/campaign/rule identification, cap checking (volume, target total, balance), and target selection implemented.
-POST /internal_api/log_cdr: Core logic for inserting CDRs and performing transactional updates to user balance, target counters, and campaign counters implemented.
+Phase 1-2: Infrastructure & Initial Server Config: (Complete) GCP VM, Static IP, DNS, Firewalls (GCP/UFW), Fail2Ban, OS updates.
+Phase 3: Asterisk Installation: (Complete) Asterisk 20 compiled, installed, systemd service running.
+Phase 4: PostgreSQL Database Installation: (Complete) PostgreSQL installed, DB (call_platform_db) created, User (call_platform_user) created.
+Phase 5: Nginx Web Server Installation: (Complete) Nginx installed, basic access verified.
+Phase 6: Python & Flask Environment Setup: (Complete) Python 3, venv, project directory (/opt/call_platform or cfap), dependencies installed (requirements.txt), .env configured.
+Phase 7: Nginx Reverse Proxy Configuration: (Complete) Configured for domain, proxying to backend (Gunicorn).
+Phase 8: Backend Application Service (Gunicorn + Systemd): (Complete) Systemd service managing Gunicorn process successfully.
+Phase 9: Database Schema Design & Implementation (v3.0 ARA): (Complete)
+Detailed PostgreSQL schema (schema_v3.sql) defined with ARA focus (User, Client, pjsip_*, DID, Campaign, campaign_client_settings, Logs).
+Flask-Migrate initialized, initial migration generated.
+Schema successfully applied via flask db upgrade.
+Sample data (sample_data_v3.sql) created and successfully loaded.
+Phase 10 (Revised): Backend API & Service Layer Development: (Complete & Tested)
+Application Structure: Modular structure with App Factory, Blueprints, Service Layer implemented.
+Extensions: SQLAlchemy, Migrate, Bcrypt, LoginManager configured.
+Service Layer (app/services/): Business logic implemented for Auth, Users, Clients (incl. PJSIP sync), DIDs, Campaigns (incl. DID/Client linking), Call Routing (data retrieval), Call Logging (CDR insert, counter increment). Commits moved from services to route handlers.
+API Layer (app/api/):
+Authentication API (/api/auth): Login, Logout, Status endpoints implemented and tested.
+Admin API (/api/admin): User Management & Client/PJSIP Management endpoints implemented and tested. Authorization enforced.
+Seller API (/api/seller): DID Management, Campaign Management (incl. DID/Client linking) endpoints implemented and tested. Authorization enforced. Log viewing endpoint implemented and tested.
+Internal API (/api/internal): Call Logging endpoint (/log_call) implemented (ready for AGI). Routing endpoint (/route_info) conceptually replaced by Asterisk needing to query ARA/DB/simpler API based on dialplan logic. Token security decorator added.
+Schemas (app/api/schemas/): Marshmallow schemas implemented for request validation and response serialization for all tested endpoints.
+Phase X: Pytest Integration Testing: (Complete for implemented APIs)
+conftest.py set up with fixtures for app, client, db (with sample data load), session (transaction rollback), logged-in clients.
+Integration tests written and passing for:
+Auth API (test_auth_api.py)
+Admin User API (test_admin_user_api.py)
+Admin Client API (test_admin_client_api.py)
+Seller DID API (test_seller_did_api.py)
+Seller Campaign API (test_seller_campaign_api.py)
+Seller Log API (test_seller_log_api.py)
 3. Verification & Testing:
 
-All implemented API endpoints were manually tested using Postman against the local development environment and subsequently verified on the remote deployment.
-Testing included successful CRUD operations, error handling (validation, not found, conflicts, authorization), and verification of database state changes (using psql and subsequent API calls).
-The core internal APIs were tested by simulating AGI requests via Postman, including successful routing and various rejection scenarios (caps, balance, etc.).
+All implemented user-facing (Admin, Seller) and authentication API endpoints have been verified through comprehensive Pytest integration tests, covering success paths, error conditions, validation, and authorization.
+Database state consistency maintained via fixtures and transactional tests.
 4. Issues Encountered & Resolved:
 
-An initial 405 Method Not Allowed error on POST /login reported during server setup was not reproducible during later local/remote testing and is considered resolved.
-An AttributeError in the PUT /api/targets/<id> update logic was identified and fixed.
-A database error (updated_at column missing) in the PUT /api/notifications/<id>/read endpoint was identified and fixed by adding the column.
-An UnboundLocalError in the exception handling of GET /internal_api/route_info was identified and fixed.
-A DID not found error during GET /internal_api/route_info testing was traced to the + sign in the DID parameter being dropped; resolved by URL-encoding the + as %2B in test requests.
-A silent transaction rollback issue in POST /internal_api/log_cdr was diagnosed and resolved by adding detailed logging and confirming database state.
-5. Immediate Next Steps (Phase 11: Asterisk Integration):
+Multiple Pytest failures related to database transaction isolation, session management, and fixture scope were diagnosed and resolved (iteratively refining conftest.py fixtures and test setup logic, removing commits from services).
+Marshmallow schema validation errors (missing fields, partial updates, data_key vs. field name) were identified and corrected in tests and schemas.
+Error handling in route handlers improved to map service exceptions to correct HTTP status codes (e.g., 404 vs 403/409).
+Minor bugs like missing imports and incorrect variable names in tests were fixed.
+5. Immediate Next Steps (Phase 11 Revised: Asterisk + ARA Integration):
 
-The backend is fully prepared. The next phase focuses entirely on configuring Asterisk to utilize the backend APIs:
+The backend API and database are ready. Focus shifts entirely to configuring Asterisk:
 
-Develop routing_lookup.agi Script:
-Create the Python script (likely in /var/lib/asterisk/agi-bin/).
-Implement logic to read the incoming DID from AGI environment variables.
-Make an HTTP GET request to http://127.0.0.1:5000/internal_api/route_info (using the URL-encoded DID).
-Parse the JSON response.
-Set Asterisk channel variables based on the parsed response (e.g., ROUTING_STATUS, REJECT_REASON, TARGET_URI_1, TARGET_CONCURRENCY_1, TARGET_URI_2, TARGET_CONCURRENCY_2, etc., MIN_BILLABLE_DURATION, COST_RATE).
-Develop cdr_logger.agi Script:
-Create the Python script.
-Implement logic to read relevant Asterisk channel variables at call hangup (e.g., ${CDR(start)}, ${CDR(answer)}, ${CDR(end)}, ${CDR(duration)}, ${CDR(billsec)}, ${CALLERID(num)}, ${CALLERID(name)}, ${CHANNEL(dnid)}, ${CHANNEL(state)}, ${HANGUPCAUSE}, ${DIALSTATUS}, ${UNIQUEID}, ${LINKEDID}, ${ROUTING_STATUS}, ${REJECT_REASON}, ${EFFECTIVE_TARGET_ID}, ${MIN_BILLABLE_DURATION}, ${COST_RATE}). Note: Some variables need careful setting/retrieval.
-Calculate billable_duration based on status and MIN_BILLABLE_DURATION.
-Construct the JSON payload for the backend API.
-Make an HTTP POST request to http://127.0.0.1:5000/internal_api/log_cdr.
+Configure Asterisk for ARA:
+Set up res_config_pgsql.so in modules.conf.
+Configure extconfig.conf to define the PostgreSQL connection details and map ARA table names (pjsip.conf type) to the database tables (pjsip_endpoints, pjsip_aors, pjsip_auths).
+Configure sorcery.conf (if using wizards) or ensure res_pjsip.conf loads PJSIP configuration via the realtime backend (psql, config, pjsip.conf). Define necessary transports.
 Develop Asterisk Dialplan (extensions.conf):
-Create or modify contexts in /etc/asterisk/extensions.conf.
-Define an entry point for incoming calls based on how they arrive (e.g., from a specific PJSIP trunk/endpoint).
-In the dialplan:
-Answer the call.
-Execute the routing_lookup.agi script using the AGI() application.
-Use GotoIf() or similar conditionals to check the ROUTING_STATUS variable. If 'reject', play Busy() or Hangup().
-If 'proceed', use Set() to potentially parse target lists (if multiple targets) and loop through them.
-Inside the loop (or directly if only one target): Use GROUP() and GROUP_COUNT() with the TARGET_CONCURRENCY_LIMIT variable to check concurrency for the specific target group.
-If concurrency allows, use Dial() to call the TARGET_URI (e.g., Dial(PJSIP/${TARGET_URI_1}...)). Include appropriate timeout and options (like h flag to ensure hangup handler runs). Capture ${DIALSTATUS}.
-Handle different DIALSTATUS outcomes (ANSWER, BUSY, NOANSWER, CONGESTION, CHANUNAVAIL).
-Set channel variables needed by cdr_logger.agi (like EFFECTIVE_TARGET_ID if the call connected).
-Define the h extension context to unconditionally run cdr_logger.agi.
-6. Supporting Files Status:
-
-app.py: Contains the latest, tested Flask backend code.
-requirements.txt: Reflects all necessary Python dependencies.
-schema.sql: Defines the correct, current database structure.
-sample_data.sql: Contains the up-to-date sample dataset reflecting user roles and relationships (ensure password hashes are correctly generated and inserted).
-.env (remote): Configured for production database connection and settings.
-call_platform.service: Systemd unit file correctly configured.
-Nginx configuration (/etc/nginx/sites-available/call_platform): Correctly proxying to the backend.
-The project is in a very good state, having completed the complex backend logic and API development. The focus now shifts entirely to the telephony integration layer.
+Create context for incoming calls.
+Use dialplan functions/applications to:
+Identify incoming DID (${CHANNEL(dnid)}).
+Look up associated User/Campaign (requires DB query via func_odbc or potentially a very simple internal API call).
+Fetch eligible CampaignClientSettings for the Campaign (DB query/simple API call), ordered by strategy.
+Loop through eligible client settings.
+Check total_calls_allowed vs current_total_calls from fetched data.
+Check concurrency using GROUP() and GROUP_COUNT(ccs-{setting_id}) against max_concurrency from fetched data.
+If checks pass, execute Dial(PJSIP/{client_identifier},${dial_timeout_seconds},...). Asterisk uses ARA to find the endpoint details. Store the ccs_id (CampaignClientSetting ID) of the attempted target in a channel variable.
+Handle DIALSTATUS for failover/fallback based on routing_strategy.
+Develop AGI Script (cdr_logger.agi):
+Create Python script in /var/lib/asterisk/agi-bin/.
+Read necessary channel variables (timestamps, durations, callerID, DID, UniqueID, LinkedID, DIALSTATUS, hangup cause, and the stored ccs_id of the final dialed target).
+Construct JSON payload for the backend logging API.
+Make POST request to http://127.0.0.1:5000/api/internal/log_call, including the security token header.
+Testing: Use Asterisk CLI (core set verbose, pjsip show endpoints, realtime load, dialplan show, channel originate) for step-by-step verification.

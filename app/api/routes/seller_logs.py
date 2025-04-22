@@ -5,7 +5,9 @@ Seller API Routes for viewing Call Logs.
 from flask import Blueprint, request, jsonify, current_app, abort
 from flask_login import current_user
 from sqlalchemy.orm import joinedload
-from datetime import datetime, timedelta # For date filtering
+# --- Added func for potential case-insensitive exact match ---
+from sqlalchemy import func
+from datetime import datetime, timedelta, timezone # Use timezone for explicit UTC comparison
 
 from app.database.models.call_log import CallLogModel
 from app.database.models.campaign import CampaignModel # For filtering checks
@@ -19,7 +21,7 @@ from app.extensions import db # Needed for pagination
 seller_logs_bp = Blueprint('seller_logs_api', __name__)
 
 # Instantiate schemas
-# call_log_schema = CallLogSchema() # Not needed for list usually
+# call_log_schema = CallLogSchema() # Only needed if fetching a single log detail
 call_log_list_schema = CallLogListSchema()
 
 @seller_logs_bp.route('', methods=['GET'])
@@ -39,14 +41,15 @@ def seller_get_call_logs():
     end_date_str = request.args.get('end_date')
     try:
         if start_date_str:
+            # Parse date and create timezone-aware datetime for start of day UTC
             start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-            # Filter for calls started on or after the beginning of start_date (UTC assumed)
-            filters.append(CallLogModel.timestamp_start >= datetime.combine(start_date, datetime.min.time(), tzinfo=None)) # Assumes DB stores UTC
+            start_dt_utc = datetime.combine(start_date, datetime.min.time(), tzinfo=timezone.utc)
+            filters.append(CallLogModel.timestamp_start >= start_dt_utc)
         if end_date_str:
+            # Parse date and create timezone-aware datetime for start of *next* day UTC
             end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
-            # Filter for calls started before the beginning of the day *after* end_date
-            end_date_exclusive = end_date + timedelta(days=1)
-            filters.append(CallLogModel.timestamp_start < datetime.combine(end_date_exclusive, datetime.min.time(), tzinfo=None))
+            end_dt_exclusive_utc = datetime.combine(end_date + timedelta(days=1), datetime.min.time(), tzinfo=timezone.utc)
+            filters.append(CallLogModel.timestamp_start < end_dt_exclusive_utc)
     except ValueError:
         valid_query = False
         error_message = "Invalid date format. Use YYYY-MM-DD."
@@ -63,6 +66,7 @@ def seller_get_call_logs():
             filters.append(CallLogModel.campaign_id == campaign_id_filter)
         else:
             valid_query = False
+            # Provide specific error message
             error_message = f"Campaign ID {campaign_id_filter} not found or not owned by user."
 
     # Filter by DID ID (check ownership)
@@ -78,44 +82,62 @@ def seller_get_call_logs():
             valid_query = False
             error_message = f"DID ID {did_id_filter} not found or not owned by user."
 
-    # Filter by Client ID (client doesn't need to be owned by user)
+    # Filter by Client ID
     client_id_filter = request.args.get('client_id', type=int)
     if client_id_filter:
-        client_exists = db.session.query(db.exists().where(ClientModel.id == client_id_filter)).scalar()
+        # Just check if the client ID exists in the clients table
+        client_exists = db.session.query(db.exists().where(
+            ClientModel.id == client_id_filter
+        )).scalar()
         if client_exists:
+            # Apply filter directly to the log's client_id column
+            # Base user_id filter ensures we only get seller's logs anyway
             filters.append(CallLogModel.client_id == client_id_filter)
         else:
             valid_query = False
             error_message = f"Client ID {client_id_filter} not found."
 
-    # Filter by Call Status
+    # Filter by Call Status (Exact Match, Case-Sensitive recommended unless DB is CI)
     status_filter = request.args.get('call_status', type=str)
     if status_filter:
-        filters.append(CallLogModel.call_status.ilike(f"%{status_filter}%")) # Case-insensitive search
+        # Use exact match (case-sensitive depends on DB collation)
+        filters.append(CallLogModel.call_status == status_filter)
+        # Or for case-insensitive exact match:
+        # filters.append(func.lower(CallLogModel.call_status) == func.lower(status_filter))
 
     # --- Query Execution ---
     if not valid_query:
         abort(400, description=error_message)
 
     try:
-        query = CallLogModel.query.options(
-                    # Eager load related info needed by schema
+        # Base query on CallLogModel
+        query = db.session.query(CallLogModel)
+
+        # Apply eager loading options
+        query = query.options(
                     joinedload(CallLogModel.campaign),
                     joinedload(CallLogModel.did),
                     joinedload(CallLogModel.client)
-                ).filter(*filters)\
-                 .order_by(CallLogModel.timestamp_start.desc()) # Newest first
+                )
+        # Apply all collected filters
+        query = query.filter(*filters)
+        # Apply ordering
+        query = query.order_by(CallLogModel.timestamp_start.desc()) # Newest first
 
-        paginated_logs = query.paginate(page=page, per_page=per_page, error_out=False)
+        # Paginate the final query
+        # Use select=True for paginate with SQLAlchemy >= 2.0 session queries
+        paginated_logs = query.paginate(page=page, per_page=per_page, error_out=False, count=True)
 
-        result = call_log_list_schema.dump({
+        # Prepare data for serialization
+        result_data = {
             'items': paginated_logs.items,
             'page': paginated_logs.page,
-            'per_page': paginated_logs.per_page,
+            'per_page': paginated_logs.per_page, # Use attribute name
             'total': paginated_logs.total,
             'pages': paginated_logs.pages
-        })
-        return jsonify(result), 200
+        }
+        # Schema handles output key mapping ('perPage')
+        return jsonify(call_log_list_schema.dump(result_data)), 200
 
     except Exception as e:
         current_app.logger.exception(f"Unexpected error fetching call logs for user {current_user.id}: {e}")

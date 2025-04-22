@@ -4,6 +4,7 @@
 from sqlalchemy.sql import func
 from sqlalchemy.orm import validates
 from app.extensions import db
+from sqlalchemy.ext.associationproxy import association_proxy
 
 
 # Association Table Model for Campaign <-> DID (Many-to-Many)
@@ -84,7 +85,7 @@ class CampaignModel(db.Model):
     # Many-to-Many with DIDs via association object
     did_associations = db.relationship('CampaignDidModel', back_populates='campaign', cascade="all, delete-orphan")
     # Easily get DIDs directly (optional helper)
-    # dids = association_proxy('did_associations', 'did') # Requires Association Proxy extension
+    dids = association_proxy('did_associations', 'did')
 
     # One-to-Many with CampaignClientSettings
     client_settings = db.relationship('CampaignClientSettingsModel', back_populates='campaign', lazy='dynamic', cascade="all, delete-orphan", order_by='CampaignClientSettingsModel.forwarding_priority')
