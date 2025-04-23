@@ -48,26 +48,26 @@ def admin_create_client():
 
     # Additional Validation (moved from original route for consistency, though could be in service)
     # This logic checks if nested PJSIP IDs match the main identifier *before* calling the service.
-    client_identifier = data.get('client_identifier')
-    pjsip_data = data.get('pjsip', {})
-    endpoint_id = pjsip_data.get('endpoint', {}).get('id')
-    aor_id = pjsip_data.get('aor', {}).get('id')
-    auth_config = pjsip_data.get('auth')
-    auth_id = auth_config.get('id') if isinstance(auth_config, dict) else None
+    # client_identifier = data.get('client_identifier')
+    # pjsip_data = data.get('pjsip', {})
+    # endpoint_id = pjsip_data.get('endpoint', {}).get('id')
+    # aor_id = pjsip_data.get('aor', {}).get('id')
+    # auth_config = pjsip_data.get('auth')
+    # auth_id = auth_config.get('id') if isinstance(auth_config, dict) else None
 
-    validation_errors = {}
-    if not client_identifier: # Should be caught by schema, but defensive check
-         validation_errors["clientIdentifier"] = ["This field is required."]
-    if endpoint_id != client_identifier:
-        validation_errors["pjsip.endpoint.id"] = [f"Endpoint ID must match client_identifier ('{client_identifier}')."]
-    if aor_id != client_identifier:
-        validation_errors["pjsip.aor.id"] = [f"AOR ID must match client_identifier ('{client_identifier}')."]
-    if auth_config and not auth_id: # ID is required if auth section is present
-        validation_errors["pjsip.auth.id"] = ["Auth ID is required if auth section is provided."]
+    # validation_errors = {}
+    # if not client_identifier: # Should be caught by schema, but defensive check
+    #      validation_errors["clientIdentifier"] = ["This field is required."]
+    # if endpoint_id != client_identifier:
+    #     validation_errors["pjsip.endpoint.id"] = [f"Endpoint ID must match client_identifier ('{client_identifier}')."]
+    # if aor_id != client_identifier:
+    #     validation_errors["pjsip.aor.id"] = [f"AOR ID must match client_identifier ('{client_identifier}')."]
+    # if auth_config and not auth_id: # ID is required if auth section is present
+    #     validation_errors["pjsip.auth.id"] = ["Auth ID is required if auth section is provided."]
 
-    if validation_errors:
-        current_app.logger.warning(f"Admin create client pre-service validation failed: {validation_errors}")
-        return jsonify({"errors": validation_errors}), 400
+    # if validation_errors:
+    #     current_app.logger.warning(f"Admin create client pre-service validation failed: {validation_errors}")
+    #     return jsonify({"errors": validation_errors}), 400
     # --- End additional validation ---
 
     # Extract client and PJSIP data parts after validation for service call

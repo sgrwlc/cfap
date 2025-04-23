@@ -100,21 +100,20 @@ class CampaignService:
             CampaignModel or None: The campaign or None if not found/not owned.
         """
         query = db.session.query(CampaignModel)
-        if load_links:
-             # Corrected: Using selectinload which was previously undefined due to missing import
-             query = query.options(
-                 selectinload(CampaignModel.did_associations).options(
-                     joinedload(CampaignDidModel.did, innerjoin=True)
-                 ),
-                 selectinload(CampaignModel.client_settings).options(
-                     joinedload(CampaignClientSettingsModel.client, innerjoin=True)
-                 )
-             )
-
-        campaign = query.get(campaign_id)
+        # if load_links:
+        #     query = query.options(
+        #         # Use selectinload on the association table -> joinedload the target
+        #         # selectinload(CampaignModel.did_associations).joinedload(CampaignDidModel.did, innerjoin=True), # Load DID via association
+        #         selectinload(CampaignModel.client_settings).joinedload(CampaignClientSettingsModel.client, innerjoin=True) # Load Setting->Client
+        #     )
+        # Use session.get for primary key lookup
+        # campaign = query.get(campaign_id) # Causes LegacyAPIWarning and eager loading issue with dynamic?
+        # Fetch using filter and options instead when eager loading complex relationships
+        query = query.filter(CampaignModel.id == campaign_id)
+        campaign = query.one_or_none()
 
         if campaign and (user_id is None or campaign.user_id == user_id):
-             return campaign
+            return campaign
         return None
 
 
@@ -188,16 +187,28 @@ class CampaignService:
                 current_app.logger.info(f"No valid fields provided to update Campaign ID {campaign_id}.")
 
             return campaign
+        except ConflictError as e:
+            # Don't rollback here, let route handle it based on this specific error
+            current_app.logger.warning(f"Conflict error during campaign update flush for ID {campaign_id}: {e}")
+            raise e # Re-raise
         except IntegrityError as e:
-             session.rollback()
-             current_app.logger.error(f"Database integrity error updating campaign {campaign_id}: {e}", exc_info=True)
-             if 'uq_user_campaign_name' in str(e.orig):
-                 raise ConflictError(f"Campaign name '{kwargs.get('name')}' already exists for this user.")
-             else:
-                 raise ServiceError(f"Database integrity error updating campaign: {e.orig}")
+            session.rollback() # Rollback mandatory
+            current_app.logger.error(f"Database integrity error updating campaign {campaign_id}: {e}", exc_info=True)
+            if 'uq_user_campaign_name' in str(e.orig):
+                raise ConflictError(f"Campaign name '{kwargs.get('name')}' already exists for this user (constraint violation).")
+            else:
+                raise ServiceError(f"Database integrity error updating campaign: {e.orig}")
+        # --- Catch other KNOWN custom exceptions if applicable ---
+        except ValidationError as e:
+            # Don't rollback here, let route handle it
+            raise e
+        # --- Catch truly unexpected exceptions LAST ---
         except Exception as e:
             session.rollback()
             current_app.logger.error(f"Unexpected error updating campaign {campaign_id} in session: {e}", exc_info=True)
+            # Avoid re-raising known custom errors as generic ServiceError
+            if isinstance(e, (ResourceNotFound, AuthorizationError)):
+                raise e
             raise ServiceError(f"Failed to update campaign in session: {e}")
 
 
@@ -379,8 +390,7 @@ class CampaignService:
 
 
     @staticmethod
-    def update_campaign_client_setting(setting_id: int, user_id: int,
-                                       updates: dict) -> CampaignClientSettingsModel:
+    def update_campaign_client_setting(setting_id: int, user_id: int, campaign_id: int, updates: dict) -> CampaignClientSettingsModel:
         """
         Updates the settings for a specific Campaign-Client link in session (DOES NOT COMMIT).
 
@@ -399,12 +409,21 @@ class CampaignService:
             ServiceError: For unexpected errors during flush.
         """
         session = db.session
-        setting = session.query(CampaignClientSettingsModel).options(
-            joinedload(CampaignClientSettingsModel.campaign)
-        ).get(setting_id)
+        setting = db.session.get(
+            CampaignClientSettingsModel,
+            setting_id,
+            options=[joinedload(CampaignClientSettingsModel.campaign)] # Eager load campaign for check
+        )
 
         if not setting:
             raise ResourceNotFound(f"Campaign client setting with ID {setting_id} not found.")
+        # --- ADDED CHECK ---
+        if setting.campaign_id != campaign_id:
+            # Log the mismatch clearly
+            current_app.logger.warning(f"Attempt to update setting {setting_id} (belongs to campaign {setting.campaign_id}) via wrong campaign URL ({campaign_id}).")
+            # Raise ResourceNotFound as the setting wasn't found for *this specific campaign* context
+            raise ResourceNotFound(f"Campaign client setting with ID {setting_id} not found for campaign {campaign_id}.")
+        # --- END ADDED CHECK ---
         if setting.campaign.user_id != user_id:
             current_app.logger.warning(f"User {user_id} attempted to update setting {setting_id} for campaign owned by user {setting.campaign.user_id}.")
             raise AuthorizationError("User is not authorized to update this campaign client setting.")
@@ -436,7 +455,7 @@ class CampaignService:
 
 
     @staticmethod
-    def remove_client_from_campaign(setting_id: int, user_id: int) -> bool:
+    def remove_client_from_campaign(setting_id: int, user_id: int, campaign_id: int) -> bool:
         """
         Marks a Campaign-Client link for deletion in the session (DOES NOT COMMIT).
 
@@ -453,12 +472,19 @@ class CampaignService:
             ServiceError: For unexpected errors during delete/flush.
         """
         session = db.session
-        setting = session.query(CampaignClientSettingsModel).options(
-            joinedload(CampaignClientSettingsModel.campaign)
-        ).get(setting_id)
+        setting = db.session.get(
+            CampaignClientSettingsModel,
+            setting_id,
+            options=[joinedload(CampaignClientSettingsModel.campaign)] # Eager load campaign for check
+        )
 
         if not setting:
             raise ResourceNotFound(f"Campaign client setting with ID {setting_id} not found.")
+        # --- ADDED CHECK ---
+        if setting.campaign_id != campaign_id:
+             current_app.logger.warning(f"Attempt to remove setting {setting_id} (belongs to campaign {setting.campaign_id}) via wrong campaign URL ({campaign_id}).")
+             raise ResourceNotFound(f"Campaign client setting with ID {setting_id} not found for campaign {campaign_id}.")
+        # --- END ADDED CHECK ---
         if setting.campaign.user_id != user_id:
             current_app.logger.warning(f"User {user_id} attempted to remove setting {setting_id} for campaign owned by user {setting.campaign.user_id}.")
             raise AuthorizationError("User is not authorized to remove this campaign client setting.")

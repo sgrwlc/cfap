@@ -1,121 +1,210 @@
 # tests/integration/api/test_auth_api.py
 # -*- coding: utf-8 -*-
 """
-Integration tests for the /api/auth endpoints.
+Integration tests for the /api/auth endpoints, aligned with refactored services.
 """
 import json
 import pytest
-import logging # Use logging
+import logging
 
+# Import User model for type checking if needed, and Service for setup
 from app.database.models.user import UserModel
-# Import UserService ONLY if needed for specific status setup not possible via API
 from app.services.user_service import UserService
 
 log = logging.getLogger(__name__)
 
-# Fixtures: client, session, db, logged_in_client, logged_in_admin_client
-
-# Helper to create user via Admin API (assuming admin is logged in)
-def create_user_via_api(admin_client, username, email, password, role='user', status='active'):
-    payload = {"username": username, "email": email, "password": password, "role": role, "status": status}
-    response = admin_client.post('/api/admin/users', json=payload)
-    assert response.status_code == 201, f"Failed to create user '{username}' via API for test setup: {response.data.decode()}"
-    return response.get_json()
+# Fixtures 'client', 'session', 'db', 'logged_in_client', 'logged_in_admin_client' used.
 
 # --- Test /api/auth/login ---
 
-def test_login_success(client, logged_in_admin_client): # Use admin client for setup
-    """ GIVEN user created via API; WHEN POST /login with correct credentials; THEN 200 """
-    # Arrange: Create user using the admin API
-    username = "logintestuser_api"
-    password = "PasswordAPI123!"
-    email = "login_api@test.com"
-    create_user_via_api(logged_in_admin_client, username, email, password, role='user', status='active')
+def test_login_success(client, session):
+    """
+    GIVEN a user created in the test database via service (no commit)
+    WHEN a POST request is made to /api/auth/login with correct credentials
+    THEN check the response is 200 OK and contains expected user details
+         and the session cookie is set on the client.
+    """
+    log.debug("Running test_login_success")
+    # Arrange: Create a test user using the service within the transaction
+    username = "logintestuser_phase5"
+    password = "Password123!"
+    email = "login_p5@test.com"
+    user = UserService.create_user(username=username, email=email, password=password, role='user', status='active')
+    session.flush()
 
-    # Act: Make login request with non-admin client
-    response = client.post('/api/auth/login', json={'username': username, 'password': password})
+    # Act: Make login request
+    response = client.post('/api/auth/login', json={
+        'username': username,
+        'password': password
+    })
 
-    # Assert
-    assert response.status_code == 200
-    response_data = response.get_json()
+    # Assert Response Status and Body
+    assert response.status_code == 200, f"Login failed: {response.data.decode()}"
+    response_data = json.loads(response.data)
     assert response_data['message'] == "Login successful."
-    assert 'user' in response_data and response_data['user']['username'] == username
-    assert response.headers.get('Set-Cookie') is not None
+    assert 'user' in response_data
+    assert response_data['user']['username'] == username
+    assert response_data['user']['email'] == email
+    assert response_data['user']['role'] == 'user'
+    assert response_data['user']['status'] == 'active'
+
+    # Assert Cookies using response headers (checking presence, not full validation)
+    cookies_set = response.headers.getlist('Set-Cookie')
+    log.debug(f"Set-Cookie headers received: {cookies_set}")
+
+    session_cookie_found = any(cookie.strip().startswith('session=') for cookie in cookies_set)
+    # Check for remember token set by login_user(remember=True)
+    remember_cookie_found = any(cookie.strip().startswith('remember_token=') for cookie in cookies_set)
+
+    # Assert that both the session cookie and remember token were set
+    assert session_cookie_found, "Session cookie was not found in Set-Cookie headers."
+    # Since we used remember=True, also check for the remember token
+    assert remember_cookie_found, "Remember token cookie was not found in Set-Cookie headers."
+    log.debug("Finished test_login_success")
+
+    # Assert that at least the session cookie was set
+    assert session_cookie_found, "Session cookie was not set on the client after login."
+    # Since we used remember=True, also check for the remember token
+    assert remember_cookie_found, "Remember token cookie was not set on the client after login with remember=True."
+    log.debug("Finished test_login_success")
 
 
-def test_login_fail_wrong_password(client, logged_in_admin_client):
-    """ GIVEN user created via API; WHEN POST /login with wrong password; THEN 401 """
-    # Arrange
-    username = "wrongpassuser_api"
-    password = "PasswordAPI123!"
-    create_user_via_api(logged_in_admin_client, username, "wrongpass_api@test.com", password)
+# --- Other tests remain the same ---
 
-    # Act
-    response = client.post('/api/auth/login', json={'username': username, 'password': "WrongPasswordAPI!"})
+def test_login_fail_wrong_password(client, session):
+    """
+    GIVEN a user created in the test database
+    WHEN a POST request is made to /api/auth/login with incorrect password
+    THEN check the response is 401 Unauthorized with appropriate message.
+    """
+    # Arrange: Create user
+    username = "wrongpassuser_p5"
+    password = "Password123!"
+    UserService.create_user(username=username, email="wrongpass_p5@test.com", password=password, role='user', status='active')
+    session.flush()
+
+    # Act: Make login request with wrong password
+    response = client.post('/api/auth/login', json={
+        'username': username,
+        'password': "WrongPassword!"
+    })
 
     # Assert
     assert response.status_code == 401
-    assert "Invalid username or password" in response.get_json().get('message', '')
+    response_data = json.loads(response.data)
+    assert "Invalid username or password" in response_data.get('message', '')
 
+def test_login_fail_inactive_user(client, session):
+    """
+    GIVEN an inactive user created in the test database
+    WHEN a POST request is made to /api/auth/login with correct credentials
+    THEN check the response is 401 Unauthorized with appropriate message.
+    """
+    # Arrange: Create inactive user
+    username = "inactiveuser_p5"
+    password = "Password123!"
+    UserService.create_user(username=username, email="inactive_p5@test.com", password=password, role='user', status='inactive')
+    session.flush()
 
-def test_login_fail_inactive_user(client, logged_in_admin_client):
-    """ GIVEN inactive user created via API; WHEN POST /login; THEN 401 """
-    # Arrange
-    username = "inactiveuser_api"
-    password = "PasswordAPI123!"
-    create_user_via_api(logged_in_admin_client, username, "inactive_api@test.com", password, status='inactive')
-
-    # Act
-    response = client.post('/api/auth/login', json={'username': username, 'password': password})
+    # Act: Make login request
+    response = client.post('/api/auth/login', json={
+        'username': username,
+        'password': password
+    })
 
     # Assert
     assert response.status_code == 401
-    # The service now raises specific errors, check message accordingly
-    assert "User account is inactive" in response.get_json().get('message', '') or \
-           "Invalid username or password" in response.get_json().get('message', '') # Depending on exact AuthService flow
+    response_data = json.loads(response.data)
+    assert "User account is inactive" in response_data.get('message', '')
 
+def test_login_fail_user_not_found(client, session):
+    """
+    GIVEN no user exists with the provided username
+    WHEN a POST request is made to /api/auth/login
+    THEN check the response is 401 Unauthorized.
+    """
+    # Act: Attempt login with non-existent username
+    response = client.post('/api/auth/login', json={
+        'username': "nonexistentuser_p5",
+        'password': "Password123!"
+    })
+
+    # Assert
+    assert response.status_code == 401
+    response_data = json.loads(response.data)
+    assert "Invalid username or password" in response_data.get('message', '')
 
 def test_login_fail_missing_username(client):
-    """ WHEN POST /login without username; THEN 400 """
-    response = client.post('/api/auth/login', json={'password': "PasswordAPI123!"})
+    """
+    WHEN a POST request is made to /api/auth/login without a username
+    THEN check the response is 400 Bad Request (schema validation).
+    """
+    response = client.post('/api/auth/login', json={
+        'password': "Password123!"
+    })
     assert response.status_code == 400
-    assert "Username and password are required" in response.get_json().get('message', '')
-
+    response_data = json.loads(response.data)
+    assert 'errors' in response_data
+    assert 'username' in response_data['errors']
 
 def test_login_fail_missing_password(client):
-    """ WHEN POST /login without password; THEN 400 """
-    response = client.post('/api/auth/login', json={'username': "someuser_api"})
+    """
+    WHEN a POST request is made to /api/auth/login without a password
+    THEN check the response is 400 Bad Request (schema validation).
+    """
+    response = client.post('/api/auth/login', json={
+        'username': "someuser_p5"
+    })
     assert response.status_code == 400
-    assert "Username and password are required" in response.get_json().get('message', '')
+    response_data = json.loads(response.data)
+    assert 'errors' in response_data
+    assert 'password' in response_data['errors']
 
 
 # --- Test /api/auth/status ---
 
-def test_status_when_logged_in(logged_in_client): # Uses 'pytest_seller' fixture
-    """ GIVEN logged-in client; WHEN GET /status; THEN 200 """
+def test_status_when_logged_in(logged_in_client): # Uses fixture
+    """
+    GIVEN a logged-in client (using the fixture 'logged_in_client')
+    WHEN a GET request is made to /api/auth/status
+    THEN check the response is 200 OK and contains correct logged-in user details.
+    """
+    # Act: logged_in_client fixture handles login
     client = logged_in_client # Get the client provided by the fixture
     response = client.get('/api/auth/status')
 
     # Assert
     assert response.status_code == 200
-    response_data = response.get_json()
-    assert response_data['logged_in'] is True
+    response_data = json.loads(response.data)
+    assert response_data.get('logged_in') is True
     assert 'user' in response_data
     assert response_data['user']['username'] == "pytest_seller" # Matches user created in fixture
     assert response_data['user']['role'] == 'user'
-
+    assert response_data['user']['status'] == 'active'
 
 def test_status_when_not_logged_in(client):
-    """ GIVEN client not logged in; WHEN GET /status; THEN 401 """
+    """
+    GIVEN a client that is not logged in
+    WHEN a GET request is made to /api/auth/status
+    THEN check the response is 401 Unauthorized.
+    """
+    # Act: Use the basic, non-logged-in client
     response = client.get('/api/auth/status')
+
+    # Assert
     assert response.status_code == 401
-    assert "Authentication required" in response.get_json().get('message', '')
+    response_data = json.loads(response.data)
+    assert "Authentication required" in response_data.get('message', '')
 
 
 # --- Test /api/auth/logout ---
 
-def test_logout_success(logged_in_client):
-    """ GIVEN logged-in client; WHEN POST /logout; THEN 200 and subsequent status is 401 """
+def test_logout_success(logged_in_client): # Uses fixture
+    """
+    GIVEN a logged-in client (using the fixture)
+    WHEN a POST request is made to /api/auth/logout
+    THEN check the response is 200 OK and subsequent status check returns 401.
+    """
     client = logged_in_client
 
     # Act: Logout request
@@ -123,18 +212,27 @@ def test_logout_success(logged_in_client):
 
     # Assert Logout
     assert logout_response.status_code == 200
-    assert logout_response.get_json()['message'] == "Logout successful."
+    logout_data = json.loads(logout_response.data)
+    assert logout_data['message'] == "Logout successful."
 
-    # Act: Check status *after* logout
+    # Act: Check status *after* logout using the same client instance
     status_response = client.get('/api/auth/status')
 
     # Assert Status after Logout
     assert status_response.status_code == 401
-    assert "Authentication required" in status_response.get_json().get('message', '')
+    status_data = json.loads(status_response.data)
+    assert "Authentication required" in status_data.get('message', '')
 
 
 def test_logout_when_not_logged_in(client):
-    """ WHEN POST /logout without being logged in; THEN 401 """
+    """
+    WHEN a POST request is made to /api/auth/logout without being logged in
+    THEN check the response is 401 Unauthorized.
+    """
+    # Act: Make logout request using non-authenticated client
     response = client.post('/api/auth/logout')
-    assert response.status_code == 401
-    assert "Authentication required" in response.get_json().get('message', '')
+
+    # Assert
+    assert response.status_code == 401 # @login_required decorator triggers unauthorized handler
+    response_data = json.loads(response.data)
+    assert "Authentication required" in response_data.get('message', '')

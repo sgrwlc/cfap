@@ -123,6 +123,15 @@ def seller_get_call_logs():
         # Schema handles output key mapping ('perPage')
         return jsonify(call_log_list_schema.dump(result_data)), 200
 
+    # --- MODIFY this except block ---
     except Exception as e:
+        # --- ADD this check ---
+        # Do not intercept HTTP exceptions raised by abort()
+        from werkzeug.exceptions import HTTPException # Local import ok here
+        if isinstance(e, HTTPException):
+            raise e
+        # --- END ADD ---
+
+        # Log and return 500 for other unexpected errors
         current_app.logger.exception(f"Unexpected error fetching call logs for user {current_user.id}: {e}")
         abort(500, description="Could not fetch call logs.")

@@ -133,11 +133,12 @@ class ClientService:
     def get_client_by_id(client_id: int) -> ClientModel | None:
         """Fetches a client by its primary key ID, eagerly loading PJSIP info."""
         # Eagerly load PJSIP relations as they are often needed together
-        return db.session.query(ClientModel).options(
+        load_options = [
             joinedload(ClientModel.pjsip_endpoint),
             joinedload(ClientModel.pjsip_aor),
             joinedload(ClientModel.pjsip_auth)
-        ).get(client_id)
+        ]
+        return db.session.get(ClientModel, client_id, options=load_options)
 
     @staticmethod
     def get_client_by_identifier(identifier: str) -> ClientModel | None:
@@ -341,10 +342,17 @@ class ClientService:
                 current_app.logger.warning(f"Attempt to delete client {client_id} failed: Linked to active campaign(s).")
                 # Consider querying the specific campaign names/IDs for a more informative message if needed
                 raise ConflictError(f"Cannot delete client {client_id}. It is actively linked to one or more active campaigns. Deactivate the campaigns or the links first.")
+        # --- Catch the specific ConflictError FIRST ---
+        except ConflictError as e:
+            # Re-raise it immediately for the route to handle
+            raise e
+        # --- Catch other potential errors during the check ---
         except Exception as e:
-             # Handle potential errors during the check itself
-             current_app.logger.error(f"Error checking active campaign links for client {client_id}: {e}", exc_info=True)
-             raise ServiceError("Could not verify campaign links before deleting client.")
+            # Handle potential errors during the check itself
+            current_app.logger.error(f"Error checking active campaign links for client {client_id}: {e}", exc_info=True)
+            # Reraise as ServiceError as this check is internal prerequisite
+            raise ServiceError("Could not verify campaign links before deleting client.")
+
 
 
         # Proceed with marking for deletion if checks pass
@@ -354,12 +362,12 @@ class ClientService:
             session.delete(client)
             session.flush() # Flush to potentially catch FK issues early if cascade isn't configured perfectly
             current_app.logger.info(f"Client ID {client_id} marked for deletion in session.")
-            # DO NOT COMMIT HERE - Handled by the route
             return True
-        except IntegrityError as e: # Catch integrity errors on flush (e.g., FK constraints if cascade fails)
-            session.rollback()
-            current_app.logger.error(f"Database integrity error deleting client {client_id}: {e}", exc_info=True)
-            raise ServiceError(f"Failed to stage client deletion due to DB constraints: {e.orig}")
+            # DO NOT COMMIT HERE - Handled by the route
+        # except IntegrityError as e: # Catch integrity errors on flush (e.g., FK constraints if cascade fails)
+        #     session.rollback()
+        #     current_app.logger.error(f"Database integrity error deleting client {client_id}: {e}", exc_info=True)
+        #     raise ServiceError(f"Failed to stage client deletion due to DB constraints: {e.orig}")
         except Exception as e:
             session.rollback()
             current_app.logger.error(f"Unexpected error deleting client {client_id}: {e}", exc_info=True)

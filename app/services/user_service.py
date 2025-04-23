@@ -12,8 +12,13 @@ from flask_sqlalchemy.pagination import Pagination # Import for type hint
 from app.database.models.user import UserModel
 from app.extensions import db
 # Import custom exceptions
-from app.utils.exceptions import ResourceNotFound, ConflictError, ServiceError, ValidationError, AuthorizationError
-
+from app.utils.exceptions import (
+    ResourceNotFound,
+    ConflictError,
+    ServiceError,
+    ValidationError,
+    AuthorizationError
+)
 
 class UserService:
 
@@ -140,20 +145,32 @@ class UserService:
                     updated = True
 
             if updated:
-                db.session.flush() # Flush to catch potential DB constraints early
+                db.session.flush() # Flush to check constraints early
                 current_app.logger.info(f"User ID {user_id} updated in session.")
             else:
                 current_app.logger.info(f"No valid fields provided to update user ID {user_id}.")
 
-            return user # Return the instance from the session
+            return user # Return instance from session
 
-        except IntegrityError as e:
-            db.session.rollback() # Rollback on integrity error during flush
+        # --- Catch specific exceptions that can occur during the process ---
+        except ConflictError as e: # Catch the specific ConflictError raised earlier
+            # Don't rollback here, let the route handler do it
+            current_app.logger.warning(f"Conflict error during user update flush for ID {user_id}: {e}")
+            raise e # Re-raise the original ConflictError
+        except IntegrityError as e: # Catch DB constraint errors during flush
+            db.session.rollback() # Rollback mandatory on IntegrityError
             current_app.logger.error(f"Database integrity error updating user {user_id}: {e}", exc_info=True)
-            raise ConflictError(f"Database integrity error updating user: {e.orig}")
-        except Exception as e:
-            db.session.rollback() # Rollback on any other error during update/flush
+            # Determine if it was the unique email constraint again
+            if 'unique constraint "ix_users_email"' in str(e.orig).lower():
+                raise ConflictError(f"Email conflict during database update: {e.orig}")
+            else:
+                raise ServiceError(f"Database integrity error updating user: {e.orig}")
+        except Exception as e: # Catch other unexpected errors during flush/logic
+            db.session.rollback()
             current_app.logger.error(f"Unexpected error updating user {user_id} in session: {e}", exc_info=True)
+            # Avoid re-raising known types as ServiceError if already caught
+            if isinstance(e, (ResourceNotFound, AuthorizationError, ValidationError)):
+                raise e
             raise ServiceError(f"Failed to update user in session: {e}")
 
 

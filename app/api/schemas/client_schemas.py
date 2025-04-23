@@ -11,7 +11,7 @@ class PjsipEndpointSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    id = fields.Str(required=True, dump_only=True) # ID matches client_identifier, dump only
+    id = fields.Str(required=True) # ID matches client_identifier, dump only
     transport = fields.Str(allow_none=True)
     aors = fields.Str(required=True) # Required field
     auth = fields.Str(allow_none=True)
@@ -28,7 +28,7 @@ class PjsipAorSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    id = fields.Str(required=True, dump_only=True) # ID matches client_identifier, dump only
+    id = fields.Str(required=True) # ID matches client_identifier, dump only
     contact = fields.Str(required=True) # Required field
     max_contacts = fields.Int(load_default=1, validate=validate.Range(min=1))
     qualify_frequency = fields.Int(load_default=60, validate=validate.Range(min=0))
@@ -108,7 +108,6 @@ class UpdatePjsipInputWrapperSchema(Schema):
 class UpdateClientSchema(Schema):
     class Meta:
         unknown = EXCLUDE # Allow partial updates
-
     # Client fields (identifier cannot be changed - enforced by service/route)
     name = fields.Str(validate=validate.Length(min=1))
     department = fields.Str(allow_none=True)

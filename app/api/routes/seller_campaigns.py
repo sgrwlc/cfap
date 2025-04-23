@@ -8,6 +8,7 @@ Relies on Service layer for all DB interactions and validation.
 from flask import Blueprint, request, jsonify, current_app, abort
 from flask_login import current_user
 from marshmallow import ValidationError
+from werkzeug.exceptions import HTTPException
 
 # Import db for transaction control
 from app.extensions import db
@@ -152,7 +153,18 @@ def seller_get_campaign(campaign_id):
 
         # CampaignSchema handles serialization, including nested data
         return jsonify(campaign_schema.dump(campaign)), 200
-    except Exception as e: # Catch unexpected errors during fetch/serialization
+    except (ResourceNotFound, AuthorizationError) as e:
+         # These shouldn't be raised if the initial check handles None, but catch defensively
+         db.session.rollback() # Good practice on error
+         log_func = current_app.logger.warning if isinstance(e, AuthorizationError) else current_app.logger.info
+         log_func(f"Get campaign {campaign_id} failed for user {current_user.id}: {e}")
+         status_code = 403 if isinstance(e, AuthorizationError) else 404
+         abort(status_code, description=str(e))
+    except Exception as e: # Catch only *other* unexpected errors
+        # DO NOT catch HTTPException here, let abort(404) propagate
+        if isinstance(e, HTTPException):
+             raise e
+        db.session.rollback()
         current_app.logger.exception(f"Unexpected error fetching campaign {campaign_id} for user {current_user.id}: {e}")
         abort(500, description="Could not fetch campaign details.")
 
@@ -390,14 +402,15 @@ def seller_update_campaign_client_setting(campaign_id, setting_id):
         # Service raises ResourceNotFound or AuthorizationError if checks fail
         updated_setting = CampaignService.update_campaign_client_setting(
             setting_id=setting_id,
-            user_id=current_user.id, # Pass user ID for service-level auth check
+            user_id=current_user.id,
+            campaign_id=campaign_id, # <<< Pass campaign_id from URL
             updates=updates
         )
         # Check if setting belongs to the correct campaign (extra safety check, service should ensure)
-        if updated_setting.campaign_id != campaign_id:
-             db.session.rollback() # Rollback inconsistent state
-             current_app.logger.error(f"Consistency Error: Setting {setting_id} updated but belongs to campaign {updated_setting.campaign_id}, not {campaign_id}.")
-             abort(500, description="Internal data consistency error.")
+        # if updated_setting.campaign_id != campaign_id:
+        #     db.session.rollback() # Rollback inconsistent state
+        #     current_app.logger.error(f"Consistency Error: Setting {setting_id} updated but belongs to campaign {updated_setting.campaign_id}, not {campaign_id}.")
+        #     abort(500, description="Internal data consistency error.")
 
         # --- Commit Transaction ---
         db.session.commit()
@@ -434,7 +447,8 @@ def seller_remove_campaign_client(campaign_id, setting_id):
         # Service raises ResourceNotFound or AuthorizationError if checks fail
         success = CampaignService.remove_client_from_campaign(
             setting_id=setting_id,
-            user_id=current_user.id
+            user_id=current_user.id,
+            campaign_id=campaign_id
         )
         # Optional: Add check if setting's campaign_id matches route's campaign_id?
         # Usually handled by service implicitly via ownership check.
